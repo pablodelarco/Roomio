@@ -72,6 +72,7 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
   const currentMonth = new Date().toISOString().slice(0, 7)
   const currentPayment = payments.find(p => p.tenant_id === tenant.id && p.due_date.startsWith(currentMonth))
   const isRentPaid = currentPayment?.is_paid || false
+  const isUtilitiesPaid = currentPayment?.utilities_paid || false
 
   const handleRentPaymentToggle = async (isPaid: boolean) => {
     try {
@@ -105,15 +106,59 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
       await refetchPayments()
       
       toast({
-        title: "Success",
         description: `Rent marked as ${isPaid ? 'paid' : 'pending'}`,
+        duration: 2000,
       })
     } catch (error) {
       console.error('Error updating payment:', error)
       toast({
-        title: "Error",
         description: "Failed to update payment status",
         variant: "destructive",
+        duration: 3000,
+      })
+    }
+  }
+
+  const handleUtilitiesToggle = async (isPaid: boolean) => {
+    try {
+      if (currentPayment) {
+        // Update existing payment record
+        await updatePayment.mutateAsync({
+          id: currentPayment.id,
+          utilities_paid: isPaid
+        })
+      } else {
+        // Create new payment record using supabase client
+        const { supabase } = await import("@/integrations/supabase/client")
+        
+        const currentDate = new Date()
+        const currentMonth = currentDate.toISOString().slice(0, 7) // YYYY-MM format
+        const dueDate = `${currentMonth}-01` // First day of current month
+        
+        await supabase
+          .from('rent_payments')
+          .insert({
+            tenant_id: tenant.id,
+            amount: tenant.rooms.monthly_rent,
+            due_date: dueDate,
+            is_paid: false,
+            utilities_paid: isPaid
+          })
+      }
+      
+      // Force refresh the payments data to update the UI immediately
+      await refetchPayments()
+      
+      toast({
+        description: `Utilities marked as ${isPaid ? 'paid' : 'pending'}`,
+        duration: 2000,
+      })
+    } catch (error) {
+      console.error('Error updating utilities:', error)
+      toast({
+        description: "Failed to update utilities status",
+        variant: "destructive",
+        duration: 3000,
       })
     }
   }
@@ -123,9 +168,9 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
     
     if (!formData.first_name || !formData.last_name || !formData.room_id || !formData.lease_start) {
       toast({
-        title: "Error",
         description: "Please fill in all required fields",
-        variant: "destructive"
+        variant: "destructive",
+        duration: 3000,
       })
       return
     }
@@ -146,16 +191,16 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
       } as any)
 
       toast({
-        title: "Success",
-        description: "Tenant updated successfully"
+        description: "Tenant updated successfully",
+        duration: 2000,
       })
 
       setOpen(false)
     } catch (error) {
       toast({
-        title: "Error",
         description: "Failed to update tenant",
-        variant: "destructive"
+        variant: "destructive",
+        duration: 3000,
       })
     }
   }
@@ -307,18 +352,35 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
             />
           </div>
 
-          <div className="flex items-center justify-between py-3 border-t">
-            <Label htmlFor="rent_paid" className="text-sm font-medium">Current Month Rent Paid</Label>
-            <div className="flex items-center gap-3">
-              <span className={`text-sm px-3 py-1 rounded-full ${isRentPaid ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
-                {isRentPaid ? 'Paid' : 'Pending'}
-              </span>
-              <Switch
-                id="rent_paid"
-                checked={isRentPaid}
-                onCheckedChange={handleRentPaymentToggle}
-                disabled={updatePayment.isPending}
-              />
+          <div className="space-y-4 py-3 border-t">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="rent_paid" className="text-sm font-medium">Current Month Rent Paid</Label>
+              <div className="flex items-center gap-3">
+                <span className={`text-sm px-3 py-1 rounded-full ${isRentPaid ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
+                  {isRentPaid ? 'Paid' : 'Pending'}
+                </span>
+                <Switch
+                  id="rent_paid"
+                  checked={isRentPaid}
+                  onCheckedChange={handleRentPaymentToggle}
+                  disabled={updatePayment.isPending}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Label htmlFor="utilities_paid" className="text-sm font-medium">Utilities Paid</Label>
+              <div className="flex items-center gap-3">
+                <span className={`text-sm px-3 py-1 rounded-full ${isUtilitiesPaid ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
+                  {isUtilitiesPaid ? 'Paid' : 'Pending'}
+                </span>
+                <Switch
+                  id="utilities_paid"
+                  checked={isUtilitiesPaid}
+                  onCheckedChange={handleUtilitiesToggle}
+                  disabled={updatePayment.isPending}
+                />
+              </div>
             </div>
           </div>
 
