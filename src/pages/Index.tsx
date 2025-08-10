@@ -51,23 +51,31 @@ const Index = () => {
   ] : []
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header with Apartment Selector and Quick Actions */}
-      <div className="flex items-center justify-between mb-6 p-4 border-b border-border">
+      <div className="min-h-screen bg-background">
+      {/* Header with prominent month display */}
+      <div className="text-center py-8 border-b border-border bg-gradient-to-r from-primary/5 to-secondary/5">
+        <h1 className="text-6xl font-bold text-foreground mb-2">
+          {currentMonthName.split(' ')[0]}
+        </h1>
+        <p className="text-xl text-muted-foreground">
+          {currentMonthName.split(' ')[1]}
+        </p>
+      </div>
+
+      {/* Apartment Selector */}
+      <div className="flex items-center justify-between p-4 bg-card/50">
         <div className="flex items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">
-              {selectedApartment ? selectedApartment.name : "All Properties"}
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              {currentMonthName} • {apartmentTenants.length}/{totalRooms} rooms occupied
-            </p>
-          </div>
+          <h2 className="text-xl font-semibold">
+            {selectedApartment ? selectedApartment.name : "All Properties"}
+          </h2>
+          <span className="text-sm text-muted-foreground">
+            {apartmentTenants.length}/{totalRooms} rooms occupied
+          </span>
           
-          {apartments.length > 1 && (
+          {apartments.length > 0 && (
             <Select value={selectedApartmentId} onValueChange={setSelectedApartmentId}>
-              <SelectTrigger className="w-48 bg-card">
-                <SelectValue placeholder="All Apartments" />
+              <SelectTrigger className="w-48">
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Apartments</SelectItem>
@@ -78,178 +86,26 @@ const Index = () => {
             </Select>
           )}
         </div>
-        
-        <div className="flex items-center gap-2">
-          <AddApartmentDialog />
-          <AddTenantDialog />
-          <Button size="sm" variant="outline" className="gap-2">
-            <Receipt className="h-4 w-4" />
-            Add Bill
-          </Button>
+      </div>
+
+      {/* Compact Stats Grid */}
+      <div className="grid gap-3 grid-cols-4 px-4 py-6">
+        <div className="text-center">
+          <div className="text-2xl font-bold text-primary">€{totalRentDue.toLocaleString()}</div>
+          <div className="text-xs text-muted-foreground">Rent Due</div>
         </div>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 px-4 mb-6">
-        <Card className="p-4 bg-card border-border">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <DollarSign className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-xl font-bold text-foreground">€{totalRentDue.toLocaleString()}</p>
-              <p className="text-sm text-muted-foreground">Rent Due</p>
-            </div>
-          </div>
-        </Card>
-        
-        <Card className="p-4 bg-card border-border">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-              <TrendingUp className="h-5 w-5 text-green-500" />
-            </div>
-            <div>
-              <p className="text-xl font-bold text-green-500">€{totalReceived.toLocaleString()}</p>
-              <p className="text-sm text-muted-foreground">Received</p>
-            </div>
-          </div>
-        </Card>
-        
-        <Card className="p-4 bg-card border-border">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
-              <Receipt className="h-5 w-5 text-orange-500" />
-            </div>
-            <div>
-              <p className="text-xl font-bold text-orange-500">€{totalBillsDue.toLocaleString()}</p>
-              <p className="text-sm text-muted-foreground">Bills Due</p>
-            </div>
-          </div>
-        </Card>
-        
-        <Card className="p-4 bg-card border-border">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-red-500/10 flex items-center justify-center">
-              <AlertTriangle className="h-5 w-5 text-red-500" />
-            </div>
-            <div>
-              <p className="text-xl font-bold text-red-500">{overdueCount}</p>
-              <p className="text-sm text-muted-foreground">Overdue</p>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Main Content Grid */}
-      <div className="grid gap-6 lg:grid-cols-2 px-4">
-        {/* Tenant Rent Status */}
-        <Card className="bg-card border-border">
-          <CardHeader className="pb-4">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xl text-foreground">Tenant Rent Status</CardTitle>
-              <p className="text-sm text-muted-foreground">{currentMonthName}</p>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {apartmentTenants.map((tenant) => {
-              const tenantPayment = currentMonthPayments.find(p => p.tenant_id === tenant.id)
-              const isPaid = tenantPayment?.is_paid || false
-              const amount = tenant.rooms.monthly_rent
-              const leaseEnd = tenant.lease_end ? new Date(tenant.lease_end) : null
-              const isExpiringSoon = leaseEnd && leaseEnd <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-              
-              return (
-                <div key={tenant.id} className="flex items-center justify-between p-4 rounded-xl bg-muted/30 hover:bg-muted/40 transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center">
-                      <span className="text-primary font-bold text-sm">
-                        {tenant.first_name[0]}{tenant.last_name[0]}
-                      </span>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-foreground">{tenant.first_name} {tenant.last_name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Room {tenant.rooms.room_number} • €{amount}/month
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {format(new Date(tenant.lease_start), "MMM dd, yyyy")} - {tenant.lease_end ? format(new Date(tenant.lease_end), "MMM dd, yyyy") : "Ongoing"}
-                        {isExpiringSoon && <span className="text-orange-500 ml-2">• Expiring Soon</span>}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="text-right">
-                      <p className="font-bold text-foreground">€{amount}</p>
-                      <Badge variant={isPaid ? "secondary" : "destructive"} className="text-xs">
-                        {isPaid ? "Paid" : "Pending"}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-            
-            {apartmentTenants.length === 0 && (
-              <div className="text-center py-8">
-                <Users className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                <p className="text-muted-foreground">No tenants in this property</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Bills Status */}
-        <Card className="bg-card border-border">
-          <CardHeader className="pb-4">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xl text-foreground">Bills Status</CardTitle>
-              <Button size="sm" className="gap-2">
-                <Plus className="h-4 w-4" />
-                Add Bill
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {mockBills.map((bill) => {
-              const isPaid = bill.status === 'paid'
-              const isOverdue = new Date(bill.dueDate) < new Date() && !isPaid
-              
-              return (
-                <div key={bill.id} className="flex items-center justify-between p-4 rounded-xl bg-muted/30 hover:bg-muted/40 transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-secondary/20 flex items-center justify-center">
-                      <span className="text-secondary-foreground font-bold text-sm">
-                        {bill.name.charAt(0)}
-                      </span>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-foreground">{bill.name}</p>
-                      <p className="text-sm text-muted-foreground">{bill.type} • Due {format(new Date(bill.dueDate), "MMM dd, yyyy")}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="text-right">
-                      <p className="font-bold text-foreground">€{bill.amount}</p>
-                      <Badge 
-                        variant={isPaid ? "secondary" : isOverdue ? "destructive" : "outline"} 
-                        className="text-xs"
-                      >
-                        {isPaid ? "Paid" : isOverdue ? "Overdue" : "Pending"}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-            
-            {mockBills.length === 0 && (
-              <div className="text-center py-8">
-                <Receipt className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                <p className="text-muted-foreground">No bills for this property</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <div className="text-center">
+          <div className="text-2xl font-bold text-green-600">€{totalReceived.toLocaleString()}</div>
+          <div className="text-xs text-muted-foreground">Received</div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl font-bold text-orange-600">€{totalBillsDue.toLocaleString()}</div>
+          <div className="text-xs text-muted-foreground">Bills Due</div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl font-bold text-red-600">{overdueCount}</div>
+          <div className="text-xs text-muted-foreground">Overdue</div>
+        </div>
       </div>
     </div>
   );

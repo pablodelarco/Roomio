@@ -198,3 +198,59 @@ export function useCreateTenant() {
     }
   })
 }
+
+export function useDeleteApartment() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('apartments')
+        .delete()
+        .eq('id', id)
+      
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["apartments"] })
+      queryClient.invalidateQueries({ queryKey: ["rooms"] })
+    }
+  })
+}
+
+export function useDeleteTenant() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('tenants')
+        .delete()
+        .eq('id', id)
+      
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tenants"] })
+      queryClient.invalidateQueries({ queryKey: ["rooms"] })
+    }
+  })
+}
+
+export function useUpdateRentPayment() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: async ({ id, is_paid, paid_date }: { id: string; is_paid: boolean; paid_date?: string }) => {
+      const { error } = await supabase
+        .from('rent_payments')
+        .update({ is_paid, paid_date })
+        .eq('id', id)
+      
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["rent_payments"] })
+    }
+  })
+}
