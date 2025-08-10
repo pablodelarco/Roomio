@@ -62,6 +62,7 @@ export type Database = {
           provider: string
           ready_to_pay: boolean | null
           updated_at: string
+          utilities_paid: boolean | null
         }
         Insert: {
           amount: number
@@ -77,6 +78,7 @@ export type Database = {
           provider: string
           ready_to_pay?: boolean | null
           updated_at?: string
+          utilities_paid?: boolean | null
         }
         Update: {
           amount?: number
@@ -92,6 +94,7 @@ export type Database = {
           provider?: string
           ready_to_pay?: boolean | null
           updated_at?: string
+          utilities_paid?: boolean | null
         }
         Relationships: []
       }

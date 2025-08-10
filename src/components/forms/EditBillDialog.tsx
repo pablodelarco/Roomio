@@ -11,7 +11,7 @@ import { format } from "date-fns"
 import { useApartments, useBills, useUpdateBill, type Bill } from "@/hooks/use-apartments"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Switch } from "@/components/ui/switch"
 
 interface EditBillDialogProps {
   bill: Bill & {
@@ -31,7 +31,8 @@ export function EditBillDialog({ bill, children }: EditBillDialogProps) {
     period_start: null as Date | null,
     period_end: null as Date | null,
     ready_to_pay: false,
-    is_paid: false
+    is_paid: false,
+    utilities_paid: false
   })
 
   const { data: apartments = [] } = useApartments()
@@ -52,7 +53,8 @@ export function EditBillDialog({ bill, children }: EditBillDialogProps) {
         period_start: bill.period_start ? new Date(bill.period_start) : null,
         period_end: bill.period_end ? new Date(bill.period_end) : null,
         ready_to_pay: bill.ready_to_pay || false,
-        is_paid: bill.is_paid || false
+        is_paid: bill.is_paid || false,
+        utilities_paid: bill.utilities_paid || false
       })
     }
   }, [bill])
@@ -81,6 +83,7 @@ export function EditBillDialog({ bill, children }: EditBillDialogProps) {
         period_end: formData.period_end?.toISOString().split('T')[0] || null,
         ready_to_pay: formData.ready_to_pay,
         is_paid: formData.is_paid,
+        utilities_paid: formData.utilities_paid,
         paid_date: formData.is_paid ? new Date().toISOString().split('T')[0] : null
       })
 
@@ -258,22 +261,30 @@ export function EditBillDialog({ bill, children }: EditBillDialogProps) {
             </div>
           </div>
 
-          <div className="flex items-center gap-6">
-            <div className="flex items-center space-x-2">
-              <Checkbox
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="ready_to_pay" className="text-sm">Ready to pay</Label>
+              <Switch
                 id="ready_to_pay"
                 checked={formData.ready_to_pay}
-                onCheckedChange={(checked) => setFormData({ ...formData, ready_to_pay: !!checked })}
+                onCheckedChange={(checked) => setFormData({ ...formData, ready_to_pay: checked })}
               />
-              <Label htmlFor="ready_to_pay" className="text-sm">Ready to pay</Label>
             </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
+            <div className="flex items-center justify-between">
+              <Label htmlFor="is_paid" className="text-sm">Paid</Label>
+              <Switch
                 id="is_paid"
                 checked={formData.is_paid}
-                onCheckedChange={(checked) => setFormData({ ...formData, is_paid: !!checked })}
+                onCheckedChange={(checked) => setFormData({ ...formData, is_paid: checked })}
               />
-              <Label htmlFor="is_paid" className="text-sm">Paid</Label>
+            </div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="utilities_paid" className="text-sm">Utilities paid</Label>
+              <Switch
+                id="utilities_paid"
+                checked={formData.utilities_paid}
+                onCheckedChange={(checked) => setFormData({ ...formData, utilities_paid: checked })}
+              />
             </div>
           </div>
 

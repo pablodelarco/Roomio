@@ -62,6 +62,7 @@ export type Bill = {
   period_end: string | null
   ready_to_pay: boolean
   is_paid: boolean
+  utilities_paid: boolean
   paid_date: string | null
   created_at: string
   updated_at: string
@@ -450,6 +451,7 @@ export function useUpdateBill() {
           period_end: billData.period_end,
           ready_to_pay: billData.ready_to_pay,
           is_paid: billData.is_paid,
+          utilities_paid: billData.utilities_paid,
           paid_date: billData.paid_date,
           updated_at: new Date().toISOString()
         })
