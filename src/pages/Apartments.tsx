@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useApartments, useDeleteApartment, useTenants } from "@/hooks/use-apartments"
 import { AddApartmentDialog } from "@/components/forms/AddApartmentDialog"
+import { EditApartmentDialog } from "@/components/forms/EditApartmentDialog"
 import { useToast } from "@/hooks/use-toast"
 
 const Apartments = () => {
@@ -133,9 +134,7 @@ const Apartments = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button size="sm" variant="ghost">
-                      <Edit className="h-4 w-4" />
-                    </Button>
+                    <EditApartmentDialog apartment={apartment} />
                     <Button 
                       size="sm" 
                       variant="ghost"

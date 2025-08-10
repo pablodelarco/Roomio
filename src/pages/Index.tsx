@@ -78,7 +78,7 @@ const Index = () => {
   ] : []
 
   return (
-      <div className="min-h-screen bg-[#0a0a0a] text-white">
+      <div className="min-h-screen bg-background text-foreground">
       {/* Header with prominent month display */}
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center justify-between mb-6">
@@ -95,10 +95,10 @@ const Index = () => {
         {apartments.length > 0 && (
           <div className="mb-4">
             <Select value={selectedApartmentId} onValueChange={setSelectedApartmentId}>
-              <SelectTrigger className="w-48 bg-[#1a1a1a] border-[#333] text-white">
+              <SelectTrigger className="w-48 bg-card border-border text-foreground">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-[#1a1a1a] border-[#333]">
+              <SelectContent className="bg-card border-border">
                 <SelectItem value="all">All Apartments</SelectItem>
                 {apartments.map((apt) => (
                   <SelectItem key={apt.id} value={apt.id}>{apt.name}</SelectItem>
@@ -135,10 +135,10 @@ const Index = () => {
         {/* Main Content Grid */}
         <div className="grid grid-cols-2 gap-6">
           {/* Tenant Rent Status */}
-          <div className="bg-[#1a1a1a] rounded-xl p-4">
+          <div className="bg-card rounded-xl p-4">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-white">Tenant Rent Status</h2>
-              <span className="text-gray-400 text-sm">August 2025</span>
+              <h2 className="text-lg font-semibold text-foreground">Tenant Rent Status</h2>
+              <span className="text-muted-foreground text-sm">August 2025</span>
             </div>
             
             <div className="space-y-2">
@@ -150,18 +150,18 @@ const Index = () => {
                 return (
                   <Popover key={tenant.id}>
                     <PopoverTrigger asChild>
-                      <div className="bg-[#2a2a2a] rounded-lg p-3 flex items-center justify-between cursor-pointer hover:bg-[#333] transition-colors">
+                      <div className="bg-muted rounded-lg p-3 flex items-center justify-between cursor-pointer hover:bg-muted/70 transition-colors">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs">
                             {tenant.first_name[0]}{tenant.last_name[0]}
                           </div>
                           <div>
-                            <div className="font-medium text-white text-sm">{tenant.first_name} {tenant.last_name}</div>
-                            <div className="text-gray-400 text-xs">Room {tenant.rooms.room_number} • €{amount}.00/month</div>
+                            <div className="font-medium text-foreground text-sm">{tenant.first_name} {tenant.last_name}</div>
+                            <div className="text-muted-foreground text-xs">Room {tenant.rooms.room_number} • €{amount}.00/month</div>
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="font-bold text-white text-sm">€{amount}.00</div>
+                          <div className="font-bold text-foreground text-sm">€{amount}.00</div>
                           <div className={`text-xs px-2 py-1 rounded ${
                             isPaid ? 'text-green-500' : 'text-red-500'
                           }`}>
@@ -170,7 +170,7 @@ const Index = () => {
                         </div>
                       </div>
                     </PopoverTrigger>
-                    <PopoverContent className="w-48 p-2 bg-[#1a1a1a] border-[#333]" align="end">
+                    <PopoverContent className="w-48 p-2 bg-card border-border" align="end">
                       <div className="space-y-1">
                         <Button
                           variant="ghost"
@@ -206,9 +206,9 @@ const Index = () => {
           </div>
 
           {/* Bills Status */}
-          <div className="bg-[#1a1a1a] rounded-xl p-4">
+          <div className="bg-card rounded-xl p-4">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-white">Bills Status</h2>
+              <h2 className="text-lg font-semibold text-foreground">Bills Status</h2>
               <Button className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg flex items-center gap-2 text-sm">
                 <Plus className="h-3 w-3" />
                 Add Bill
@@ -221,18 +221,18 @@ const Index = () => {
                 const isOverdue = new Date(bill.dueDate) < new Date() && !isPaid
                 
                 return (
-                  <div key={bill.id} className="bg-[#2a2a2a] rounded-lg p-3 flex items-center justify-between">
+                  <div key={bill.id} className="bg-muted rounded-lg p-3 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-white font-bold text-xs">
+                      <div className="w-8 h-8 rounded-full bg-muted-foreground/20 flex items-center justify-center text-foreground font-bold text-xs">
                         {bill.name.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <div className="font-medium text-white text-sm">{bill.name}</div>
-                        <div className="text-gray-400 text-xs">{bill.type} • Due {format(new Date(bill.dueDate), "M/d/yyyy")}</div>
+                        <div className="font-medium text-foreground text-sm">{bill.name}</div>
+                        <div className="text-muted-foreground text-xs">{bill.type} • Due {format(new Date(bill.dueDate), "M/d/yyyy")}</div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-bold text-white text-sm">€{bill.amount}</div>
+                      <div className="font-bold text-foreground text-sm">€{bill.amount}</div>
                       <div className={`text-xs px-2 py-1 rounded ${
                         isPaid ? 'text-green-500' : isOverdue ? 'text-red-500' : 'text-orange-500'
                       }`}>
@@ -245,8 +245,8 @@ const Index = () => {
               
               {mockBills.length === 0 && (
                 <div className="text-center py-8">
-                  <Receipt className="h-8 w-8 text-gray-600 mx-auto mb-2" />
-                  <p className="text-gray-400 text-sm">No bills for this property</p>
+                  <Receipt className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                  <p className="text-muted-foreground text-sm">No bills for this property</p>
                 </div>
               )}
             </div>

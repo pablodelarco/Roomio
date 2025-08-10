@@ -254,3 +254,38 @@ export function useUpdateRentPayment() {
     }
   })
 }
+
+export function useUpdateApartment() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: async (apartment: { 
+      id: string
+      name: string
+      address: string
+      total_rooms: number
+      monthly_bills: number
+      bills_paid_until?: string
+    }) => {
+      const { data, error } = await supabase
+        .from('apartments')
+        .update({
+          name: apartment.name,
+          address: apartment.address,
+          total_rooms: apartment.total_rooms,
+          monthly_bills: apartment.monthly_bills,
+          bills_paid_until: apartment.bills_paid_until,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', apartment.id)
+        .select()
+        .single()
+      
+      if (error) throw error
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['apartments'] })
+    },
+  })
+}
