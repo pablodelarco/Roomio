@@ -67,7 +67,6 @@ export function PaymentStatusPopover({
           amount: monthlyRent,
           due_date: dueDate,
           is_paid: checked,
-          utilities_paid: localUtilitiesPaid,
           paid_date: checked ? new Date().toISOString().split('T')[0] : null
         })
         
@@ -79,7 +78,7 @@ export function PaymentStatusPopover({
             due_date: dueDate,
             is_paid: checked,
             paid_date: checked ? new Date().toISOString().split('T')[0] : null,
-            utilities_paid: localUtilitiesPaid
+            // Don't include utilities_paid here - only update what was changed
           }, {
             onConflict: 'tenant_id,due_date'
           })
@@ -150,9 +149,7 @@ export function PaymentStatusPopover({
           tenant_id: tenantId,
           amount: monthlyRent,
           due_date: dueDate,
-          is_paid: localRentPaid,
-          utilities_paid: checked,
-          paid_date: localRentPaid ? new Date().toISOString().split('T')[0] : null
+          utilities_paid: checked
         })
         
         const { error } = await supabase
@@ -161,9 +158,8 @@ export function PaymentStatusPopover({
             tenant_id: tenantId,
             amount: monthlyRent,
             due_date: dueDate,
-            is_paid: localRentPaid,
             utilities_paid: checked,
-            paid_date: localRentPaid ? new Date().toISOString().split('T')[0] : null
+            // Don't include is_paid and paid_date here - only update what was changed
           }, {
             onConflict: 'tenant_id,due_date'
           })
