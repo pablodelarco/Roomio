@@ -14,7 +14,177 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      apartments: {
+        Row: {
+          address: string
+          bills_paid_until: string | null
+          created_at: string
+          id: string
+          monthly_bills: number | null
+          name: string
+          total_rooms: number
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          bills_paid_until?: string | null
+          created_at?: string
+          id?: string
+          monthly_bills?: number | null
+          name: string
+          total_rooms?: number
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          bills_paid_until?: string | null
+          created_at?: string
+          id?: string
+          monthly_bills?: number | null
+          name?: string
+          total_rooms?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      rent_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          due_date: string
+          id: string
+          is_paid: boolean | null
+          notes: string | null
+          paid_date: string | null
+          payment_method: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          due_date: string
+          id?: string
+          is_paid?: boolean | null
+          notes?: string | null
+          paid_date?: string | null
+          payment_method?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          due_date?: string
+          id?: string
+          is_paid?: boolean | null
+          notes?: string | null
+          paid_date?: string | null
+          payment_method?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rent_payments_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rooms: {
+        Row: {
+          apartment_id: string
+          created_at: string
+          id: string
+          is_occupied: boolean | null
+          monthly_rent: number
+          room_number: string
+          updated_at: string
+        }
+        Insert: {
+          apartment_id: string
+          created_at?: string
+          id?: string
+          is_occupied?: boolean | null
+          monthly_rent: number
+          room_number: string
+          updated_at?: string
+        }
+        Update: {
+          apartment_id?: string
+          created_at?: string
+          id?: string
+          is_occupied?: boolean | null
+          monthly_rent?: number
+          room_number?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rooms_apartment_id_fkey"
+            columns: ["apartment_id"]
+            isOneToOne: false
+            referencedRelation: "apartments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenants: {
+        Row: {
+          created_at: string
+          deposit_amount: number | null
+          deposit_paid: boolean | null
+          email: string | null
+          first_name: string
+          id: string
+          last_name: string
+          lease_end: string | null
+          lease_start: string
+          phone: string | null
+          room_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deposit_amount?: number | null
+          deposit_paid?: boolean | null
+          email?: string | null
+          first_name: string
+          id?: string
+          last_name: string
+          lease_end?: string | null
+          lease_start: string
+          phone?: string | null
+          room_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deposit_amount?: number | null
+          deposit_paid?: boolean | null
+          email?: string | null
+          first_name?: string
+          id?: string
+          last_name?: string
+          lease_end?: string | null
+          lease_start?: string
+          phone?: string | null
+          room_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenants_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
