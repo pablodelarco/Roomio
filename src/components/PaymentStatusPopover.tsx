@@ -111,9 +111,6 @@ export function PaymentStatusPopover({
         description: `${tenantName} rent ${checked ? 'paid' : 'pending'}`,
         duration: 2000,
       })
-      
-      // Close popover after successful update
-      setTimeout(() => setOpen(false), 500)
     } catch (error) {
       // Revert optimistic state on error
       if (tenantId && onOptimisticUpdate) {
@@ -196,9 +193,6 @@ export function PaymentStatusPopover({
         description: `${tenantName} utilities ${checked ? 'paid' : 'pending'}`,
         duration: 2000,
       })
-      
-      // Close popover after successful update
-      setTimeout(() => setOpen(false), 500)
     } catch (error) {
       // Revert optimistic state on error
       if (tenantId && onOptimisticUpdate) {
