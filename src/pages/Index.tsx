@@ -161,7 +161,6 @@ const Index = () => {
                           <div className="text-muted-foreground text-xs">Room {tenant.rooms.room_number} • €{amount}.00/month</div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
                         <div className="text-right">
                           <div className="font-bold text-foreground text-sm">€{amount}.00</div>
                           <div className={`text-xs px-2 py-1 rounded ${
@@ -170,15 +169,6 @@ const Index = () => {
                             {isPaid ? 'Paid' : 'Pending'}
                           </div>
                         </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-7 px-2 text-xs"
-                          onClick={handleLocalPaymentToggle}
-                        >
-                          Mark as {isPaid ? 'Pending' : 'Paid'}
-                        </Button>
-                      </div>
                     </div>
                   </EditTenantDialog>
                 )
