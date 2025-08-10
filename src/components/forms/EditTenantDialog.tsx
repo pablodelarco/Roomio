@@ -146,39 +146,183 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit Rent Payment Status</DialogTitle>
+          <DialogTitle>Edit Tenant</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="text-sm text-muted-foreground">
-            <div className="font-medium">{tenant.first_name} {tenant.last_name}</div>
-            <div>Room {tenant.rooms.room_number} • €{tenant.rooms.monthly_rent}/month</div>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label htmlFor="first_name" className="text-xs">First Name *</Label>
+              <Input
+                id="first_name"
+                value={formData.first_name}
+                onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                required
+                className="h-8"
+              />
+            </div>
+            <div>
+              <Label htmlFor="last_name" className="text-xs">Last Name *</Label>
+              <Input
+                id="last_name"
+                value={formData.last_name}
+                onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                required
+                className="h-8"
+              />
+            </div>
           </div>
-          
-          <div className="flex items-center justify-between py-4">
-            <Label htmlFor="rent_paid" className="text-sm font-medium">Current Month Rent Status</Label>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label htmlFor="email" className="text-xs">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="h-8"
+              />
+            </div>
+            <div>
+              <Label htmlFor="phone" className="text-xs">Phone</Label>
+              <Input
+                id="phone"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                className="h-8"
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="room" className="text-xs">Room *</Label>
+            <Select 
+              value={formData.room_id} 
+              onValueChange={(value) => setFormData({ ...formData, room_id: value })}
+            >
+              <SelectTrigger className="h-8">
+                <SelectValue placeholder="Select a room" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableRooms.map((room) => (
+                  <SelectItem key={room.id} value={room.id}>
+                    {room.apartments.name} - Room {room.room_number} (€{room.monthly_rent}/month)
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label className="text-xs">Lease Start *</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal h-8 text-xs",
+                      !formData.lease_start && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-1 h-3 w-3" />
+                    {formData.lease_start ? format(formData.lease_start, "PP") : "Pick date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={formData.lease_start || undefined}
+                    onSelect={(date) => setFormData({ ...formData, lease_start: date || null })}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div>
+              <Label className="text-xs">Lease End</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal h-8 text-xs",
+                      !formData.lease_end && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-1 h-3 w-3" />
+                    {formData.lease_end ? format(formData.lease_end, "PP") : "Pick date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={formData.lease_end || undefined}
+                    onSelect={(date) => setFormData({ ...formData, lease_end: date || null })}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <Label htmlFor="deposit" className="text-xs">Deposit Amount</Label>
+              <Input
+                id="deposit"
+                type="number"
+                step="0.01"
+                value={formData.deposit_amount}
+                onChange={(e) => setFormData({ ...formData, deposit_amount: e.target.value })}
+                className="h-8"
+              />
+            </div>
+            <div className="flex items-center justify-between pt-4">
+              <Label htmlFor="deposit_paid" className="text-xs">Deposit Paid</Label>
+              <Switch
+                id="deposit_paid"
+                checked={formData.deposit_paid}
+                onCheckedChange={(checked) => setFormData({ ...formData, deposit_paid: checked })}
+              />
+            </div>
+            <div className="flex items-center justify-between pt-4">
+              <Label htmlFor="deposit_returned" className="text-xs">Deposit Returned</Label>
+              <Switch
+                id="deposit_returned"
+                checked={formData.deposit_returned}
+                onCheckedChange={(checked) => setFormData({ ...formData, deposit_returned: checked })}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between py-3 border-t">
+            <Label htmlFor="rent_paid" className="text-sm font-medium">Current Month Rent Paid</Label>
             <div className="flex items-center gap-3">
               <span className={`text-sm px-3 py-1 rounded-full ${isRentPaid ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
                 {isRentPaid ? 'Paid' : 'Pending'}
               </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleRentPaymentToggle(!isRentPaid)}
+              <Switch
+                id="rent_paid"
+                checked={isRentPaid}
+                onCheckedChange={handleRentPaymentToggle}
                 disabled={updatePayment.isPending}
-              >
-                {updatePayment.isPending ? "Updating..." : `Mark as ${isRentPaid ? 'Pending' : 'Paid'}`}
-              </Button>
+              />
             </div>
           </div>
 
-          <div className="flex justify-end">
-            <Button variant="outline" onClick={() => setOpen(false)}>
-              Close
+          <div className="flex justify-end gap-2 pt-2">
+            <Button type="button" variant="outline" onClick={() => setOpen(false)} className="h-8 px-3 text-xs">
+              Cancel
+            </Button>
+            <Button type="submit" disabled={updateTenant.isPending} className="h-8 px-3 text-xs">
+              {updateTenant.isPending ? "Updating..." : "Update Tenant"}
             </Button>
           </div>
-        </div>
+        </form>
       </DialogContent>
     </Dialog>
   )
