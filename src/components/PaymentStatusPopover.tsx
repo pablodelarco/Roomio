@@ -64,59 +64,37 @@ export function PaymentStatusPopover({
   }
 
   return (
-    <div className="flex items-center gap-2">
-      {/* Status indicators */}
-      <div className="flex gap-1">
-        <div className={`w-3 h-3 rounded-full ${isRentPaid ? 'bg-green-500' : 'bg-red-500'}`} 
-             title={`Rent: ${isRentPaid ? 'Paid' : 'Pending'}`} />
-        <div className={`w-3 h-3 rounded-full ${isUtilitiesPaid ? 'bg-blue-500' : 'bg-orange-500'}`}
-             title={`Utilities: ${isUtilitiesPaid ? 'Paid' : 'Pending'}`} />
-      </div>
-
-      {/* Edit popover */}
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-            <MoreHorizontal className="h-3 w-3" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-60 p-4" side="right" align="start">
-          <div className="space-y-4">
-            <h4 className="font-medium text-sm">{tenantName} - Payment Status</h4>
-            
-            <div className="flex items-center justify-between">
-              <Label htmlFor="rent-status" className="text-sm">Rent</Label>
-              <Switch
-                id="rent-status"
-                checked={isRentPaid}
-                onCheckedChange={handleRentToggle}
-                disabled={updatePayment.isPending}
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <Label htmlFor="utilities-status" className="text-sm">Utilities</Label>
-              <Switch
-                id="utilities-status"
-                checked={isUtilitiesPaid}
-                onCheckedChange={handleUtilitiesToggle}
-                disabled={updatePayment.isPending}
-              />
-            </div>
-
-            <div className="text-xs text-muted-foreground">
-              <div className="flex items-center gap-2 mb-1">
-                <div className="w-2 h-2 rounded-full bg-green-500" />
-                <span>Rent: {isRentPaid ? 'Paid' : 'Pending'}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-blue-500" />
-                <span>Utilities: {isUtilitiesPaid ? 'Paid' : 'Pending'}</span>
-              </div>
-            </div>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+          <MoreHorizontal className="h-3 w-3" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-60 p-4" side="right" align="start">
+        <div className="space-y-4">
+          <h4 className="font-medium text-sm">{tenantName} - Payment Status</h4>
+          
+          <div className="flex items-center justify-between">
+            <Label htmlFor="rent-status" className="text-sm">Rent</Label>
+            <Switch
+              id="rent-status"
+              checked={isRentPaid}
+              onCheckedChange={handleRentToggle}
+              disabled={updatePayment.isPending}
+            />
           </div>
-        </PopoverContent>
-      </Popover>
-    </div>
+
+          <div className="flex items-center justify-between">
+            <Label htmlFor="utilities-status" className="text-sm">Utilities</Label>
+            <Switch
+              id="utilities-status"
+              checked={isUtilitiesPaid}
+              onCheckedChange={handleUtilitiesToggle}
+              disabled={updatePayment.isPending}
+            />
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
   )
 }

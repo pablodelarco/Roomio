@@ -209,7 +209,6 @@ const Index = () => {
           <div className="bg-card rounded-xl p-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-foreground">Bills Status</h2>
-              <span className="text-muted-foreground text-sm">August 2025</span>
             </div>
             
             <div className="space-y-2">
