@@ -65,18 +65,19 @@ export function AddBillDialog({ children }: AddBillDialogProps) {
         ready_to_pay: false,
       })
 
+      // Less intrusive toast - shorter duration and simpler message
       toast({
-        title: "Success",
         description: "Bill added successfully",
+        duration: 2000, // Shorter duration
       })
 
       form.reset()
       setOpen(false)
     } catch (error) {
       toast({
-        title: "Error",
         description: "Failed to add bill",
         variant: "destructive",
+        duration: 3000,
       })
     }
   }

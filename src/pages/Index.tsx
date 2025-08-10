@@ -9,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useApartments, useTenants, useRentPayments, useUpdateRentPayment, useBills } from "@/hooks/use-apartments"
 import { EditTenantDialog } from "@/components/forms/EditTenantDialog"
 import { PaymentStatusPopover } from "@/components/PaymentStatusPopover"
+import { BillStatusPopover } from "@/components/BillStatusPopover"
 import { useToast } from "@/hooks/use-toast"
 import { format } from "date-fns"
 
@@ -181,7 +182,6 @@ const Index = () => {
                       {tenantPayment && (
                         <PaymentStatusPopover
                           paymentId={tenantPayment.id}
-                          isRentPaid={isRentPaid}
                           isUtilitiesPaid={isUtilitiesPaid}
                           tenantName={`${tenant.first_name} ${tenant.last_name}`}
                         />
@@ -212,8 +212,8 @@ const Index = () => {
                 const isOverdue = new Date(bill.due_date) < new Date() && !isPaid
                 
                 return (
-                  <div key={bill.id} className="bg-muted rounded-lg p-3 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+                  <div key={bill.id} className="bg-muted rounded-lg p-3 flex items-center justify-between cursor-pointer hover:bg-muted/80 transition-colors">
+                    <div className="flex items-center gap-3 flex-1">
                       <div className="w-8 h-8 rounded-full bg-muted-foreground/20 flex items-center justify-center text-foreground font-bold text-xs">
                         {bill.provider.charAt(0).toUpperCase()}
                       </div>
@@ -222,13 +222,20 @@ const Index = () => {
                         <div className="text-muted-foreground text-xs">{bill.bill_type} • Due {format(new Date(bill.due_date), "M/d/yyyy")}</div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="font-bold text-foreground text-sm">€{Number(bill.amount).toLocaleString()}</div>
-                      <div className={`text-xs px-2 py-1 rounded ${
-                        isPaid ? 'text-green-500' : isOverdue ? 'text-red-500' : 'text-orange-500'
-                      }`}>
-                        {isPaid ? 'Paid' : isOverdue ? 'Overdue' : 'Pending'}
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <div className="font-bold text-foreground text-sm">€{Number(bill.amount).toLocaleString()}</div>
+                        <div className={`text-xs px-2 py-1 rounded ${
+                          isPaid ? 'text-green-500' : isOverdue ? 'text-red-500' : 'text-orange-500'
+                        }`}>
+                          {isPaid ? 'Paid' : isOverdue ? 'Overdue' : 'Pending'}
+                        </div>
                       </div>
+                      <BillStatusPopover
+                        billId={bill.id}
+                        isPaid={isPaid}
+                        providerName={bill.provider}
+                      />
                     </div>
                   </div>
                 )

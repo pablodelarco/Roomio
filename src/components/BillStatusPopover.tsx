@@ -1,43 +1,44 @@
 import { useState } from "react"
-import { Check, X, MoreHorizontal } from "lucide-react"
+import { MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { useUpdateRentPayment } from "@/hooks/use-apartments"
+import { useUpdateBill } from "@/hooks/use-apartments"
 import { useToast } from "@/hooks/use-toast"
 
-interface PaymentStatusPopoverProps {
-  paymentId: string
-  isUtilitiesPaid: boolean
-  tenantName: string
+interface BillStatusPopoverProps {
+  billId: string
+  isPaid: boolean
+  providerName: string
 }
 
-export function PaymentStatusPopover({ 
-  paymentId, 
-  isUtilitiesPaid, 
-  tenantName 
-}: PaymentStatusPopoverProps) {
+export function BillStatusPopover({ 
+  billId, 
+  isPaid, 
+  providerName 
+}: BillStatusPopoverProps) {
   const [open, setOpen] = useState(false)
-  const updatePayment = useUpdateRentPayment()
+  const updateBill = useUpdateBill()
   const { toast } = useToast()
 
-  const handleUtilitiesToggle = async (checked: boolean) => {
+  const handleBillToggle = async (checked: boolean) => {
     try {
-      await updatePayment.mutateAsync({
-        id: paymentId,
-        utilities_paid: checked
+      await updateBill.mutateAsync({
+        id: billId,
+        is_paid: checked,
+        paid_date: checked ? new Date().toISOString().split('T')[0] : undefined
       })
       
       // Less intrusive toast - shorter duration and simpler message
       toast({
-        description: `${tenantName} utilities ${checked ? 'paid' : 'pending'}`,
+        description: `${providerName} ${checked ? 'paid' : 'pending'}`,
         duration: 2000, // Shorter duration
       })
       setOpen(false) // Close popup after action
     } catch (error) {
       toast({
-        description: "Failed to update utilities status",
+        description: "Failed to update bill status",
         variant: "destructive",
         duration: 3000,
       })
@@ -53,15 +54,15 @@ export function PaymentStatusPopover({
       </PopoverTrigger>
       <PopoverContent className="w-48 p-3 z-50 bg-background border shadow-lg" side="right" align="start">
         <div className="space-y-3">
-          <h4 className="font-medium text-sm">{tenantName}</h4>
-
+          <h4 className="font-medium text-sm">{providerName}</h4>
+          
           <div className="flex items-center justify-between">
-            <Label htmlFor="utilities-status" className="text-sm">Utilities paid</Label>
+            <Label htmlFor="bill-status" className="text-sm">Mark as paid</Label>
             <Switch
-              id="utilities-status"
-              checked={isUtilitiesPaid}
-              onCheckedChange={handleUtilitiesToggle}
-              disabled={updatePayment.isPending}
+              id="bill-status"
+              checked={isPaid}
+              onCheckedChange={handleBillToggle}
+              disabled={updateBill.isPending}
             />
           </div>
         </div>
