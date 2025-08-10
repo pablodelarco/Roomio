@@ -1,10 +1,11 @@
 import { useState } from "react"
-import { Building2, Users, DollarSign, TrendingUp, AlertTriangle, Calendar, Plus, Home, UserPlus, Receipt, ChevronDown } from "lucide-react"
+import { Building2, Users, DollarSign, TrendingUp, AlertTriangle, Calendar, Plus, Home, UserPlus, Receipt, ChevronDown, Check, X } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useApartments, useTenants, useRentPayments, useUpdateRentPayment } from "@/hooks/use-apartments"
 import { AddTenantDialog } from "@/components/forms/AddTenantDialog"
 import { AddApartmentDialog } from "@/components/forms/AddApartmentDialog"
@@ -147,29 +148,51 @@ const Index = () => {
                 const amount = tenant.rooms.monthly_rent
                 
                 return (
-                  <div 
-                    key={tenant.id} 
-                    className="bg-[#2a2a2a] rounded-lg p-3 flex items-center justify-between cursor-pointer hover:bg-[#333] transition-colors"
-                    onClick={() => handlePaymentToggle(tenant.id, isPaid)}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs">
-                        {tenant.first_name[0]}{tenant.last_name[0]}
+                  <Popover key={tenant.id}>
+                    <PopoverTrigger asChild>
+                      <div className="bg-[#2a2a2a] rounded-lg p-3 flex items-center justify-between cursor-pointer hover:bg-[#333] transition-colors">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs">
+                            {tenant.first_name[0]}{tenant.last_name[0]}
+                          </div>
+                          <div>
+                            <div className="font-medium text-white text-sm">{tenant.first_name} {tenant.last_name}</div>
+                            <div className="text-gray-400 text-xs">Room {tenant.rooms.room_number} • €{amount}.00/month</div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-bold text-white text-sm">€{amount}.00</div>
+                          <div className={`text-xs px-2 py-1 rounded ${
+                            isPaid ? 'text-green-500' : 'text-red-500'
+                          }`}>
+                            {isPaid ? 'Paid' : 'Pending'}
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <div className="font-medium text-white text-sm">{tenant.first_name} {tenant.last_name}</div>
-                        <div className="text-gray-400 text-xs">Room {tenant.rooms.room_number} • €{amount}.00/month</div>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-48 p-2 bg-[#1a1a1a] border-[#333]" align="end">
+                      <div className="space-y-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full justify-start text-green-500 hover:bg-green-500/10"
+                          onClick={() => handlePaymentToggle(tenant.id, false)}
+                        >
+                          <Check className="h-4 w-4 mr-2" />
+                          Mark as Paid
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full justify-start text-red-500 hover:bg-red-500/10"
+                          onClick={() => handlePaymentToggle(tenant.id, true)}
+                        >
+                          <X className="h-4 w-4 mr-2" />
+                          Mark as Pending
+                        </Button>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-bold text-white text-sm">€{amount}.00</div>
-                      <div className={`text-xs px-2 py-1 rounded ${
-                        isPaid ? 'text-green-500' : 'text-red-500'
-                      }`}>
-                        {isPaid ? 'Paid' : 'Pending'}
-                      </div>
-                    </div>
-                  </div>
+                    </PopoverContent>
+                  </Popover>
                 )
               })}
               
