@@ -43,7 +43,7 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
 
   const { data: apartments = [] } = useApartments()
   const { data: rooms = [] } = useRooms()
-  const { data: payments = [] } = useRentPayments()
+  const { data: payments = [], refetch: refetchPayments } = useRentPayments()
   const updateTenant = useUpdateTenant()
   const updatePayment = useUpdateRentPayment()
   const { toast } = useToast()
@@ -100,6 +100,9 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
             paid_date: isPaid ? new Date().toISOString().split('T')[0] : null
           })
       }
+      
+      // Force refresh the payments data to update the UI immediately
+      await refetchPayments()
       
       toast({
         title: "Success",
