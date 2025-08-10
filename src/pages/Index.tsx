@@ -14,12 +14,12 @@ const Index = () => {
   const { data: apartments = [] } = useApartments()
   const { data: tenants = [] } = useTenants()
   const { data: payments = [] } = useRentPayments()
-  const [selectedApartmentId, setSelectedApartmentId] = useState<string>("")
+  const [selectedApartmentId, setSelectedApartmentId] = useState<string>("all")
 
   // Filter data by selected apartment
-  const selectedApartment = apartments.find(apt => apt.id === selectedApartmentId) || apartments[0]
+  const selectedApartment = apartments.find(apt => apt.id === selectedApartmentId)
   const apartmentTenants = tenants.filter(tenant => 
-    selectedApartmentId ? tenant.rooms.apartment_id === selectedApartmentId : true
+    selectedApartmentId === "all" ? true : tenant.rooms.apartment_id === selectedApartmentId
   )
 
   // Calculate dashboard statistics
@@ -30,7 +30,7 @@ const Index = () => {
   const currentMonthPayments = payments.filter(p => {
     const paymentTenant = tenants.find(t => t.id === p.tenant_id)
     return p.due_date.startsWith(currentMonth) && 
-           (selectedApartmentId ? paymentTenant?.rooms.apartment_id === selectedApartmentId : true)
+           (selectedApartmentId === "all" ? true : paymentTenant?.rooms.apartment_id === selectedApartmentId)
   })
   const paidPayments = currentMonthPayments.filter(p => p.is_paid)
   const pendingPayments = currentMonthPayments.filter(p => !p.is_paid)
@@ -70,7 +70,7 @@ const Index = () => {
                 <SelectValue placeholder="All Apartments" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Apartments</SelectItem>
+                <SelectItem value="all">All Apartments</SelectItem>
                 {apartments.map((apt) => (
                   <SelectItem key={apt.id} value={apt.id}>{apt.name}</SelectItem>
                 ))}
