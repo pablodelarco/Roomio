@@ -58,34 +58,59 @@ export function PaymentStatusPopover({
     
     try {
       if (paymentId.includes('-')) {
-        // Use UPSERT to create or update record (unique constraint prevents duplicates)
+        // Check if record exists, then update only the specific field
         const { supabase } = await import("@/integrations/supabase/client")
         const dueDate = `${selectedMonth}-01`
         
-        console.log('Upserting payment record (rent):', {
-          tenant_id: tenantId,
-          amount: monthlyRent,
-          due_date: dueDate,
-          is_paid: checked,
-          paid_date: checked ? new Date().toISOString().split('T')[0] : null
-        })
-        
-        const { error } = await supabase
+        // First check if a payment record exists
+        const { data: existingPayment } = await supabase
           .from('rent_payments')
-          .upsert({
+          .select('id')
+          .eq('tenant_id', tenantId)
+          .eq('due_date', dueDate)
+          .limit(1)
+          .single()
+        
+        if (existingPayment) {
+          // Update only the rent fields
+          console.log('Updating rent status only:', {
+            id: existingPayment.id,
+            is_paid: checked,
+            paid_date: checked ? new Date().toISOString().split('T')[0] : null
+          })
+          
+          const { error } = await supabase
+            .from('rent_payments')
+            .update({
+              is_paid: checked,
+              paid_date: checked ? new Date().toISOString().split('T')[0] : null
+            })
+            .eq('id', existingPayment.id)
+            
+          if (error) throw error
+        } else {
+          // Create new record with all current values
+          console.log('Creating new payment record (rent):', {
             tenant_id: tenantId,
             amount: monthlyRent,
             due_date: dueDate,
             is_paid: checked,
-            paid_date: checked ? new Date().toISOString().split('T')[0] : null,
-            // Don't include utilities_paid here - only update what was changed
-          }, {
-            onConflict: 'tenant_id,due_date'
+            utilities_paid: localUtilitiesPaid,
+            paid_date: checked ? new Date().toISOString().split('T')[0] : null
           })
           
-        if (error) {
-          console.error('Supabase upsert error:', error)
-          throw error
+          const { error } = await supabase
+            .from('rent_payments')
+            .insert({
+              tenant_id: tenantId,
+              amount: monthlyRent,
+              due_date: dueDate,
+              is_paid: checked,
+              paid_date: checked ? new Date().toISOString().split('T')[0] : null,
+              utilities_paid: localUtilitiesPaid
+            })
+            
+          if (error) throw error
         }
       } else {
         // Update existing payment record
@@ -141,32 +166,57 @@ export function PaymentStatusPopover({
     
     try {
       if (paymentId.includes('-')) {
-        // Use UPSERT to create or update record (unique constraint prevents duplicates)
+        // Check if record exists, then update only the specific field
         const { supabase } = await import("@/integrations/supabase/client")
         const dueDate = `${selectedMonth}-01`
         
-        console.log('Upserting payment record (utilities):', {
-          tenant_id: tenantId,
-          amount: monthlyRent,
-          due_date: dueDate,
-          utilities_paid: checked
-        })
-        
-        const { error } = await supabase
+        // First check if a payment record exists
+        const { data: existingPayment } = await supabase
           .from('rent_payments')
-          .upsert({
+          .select('id')
+          .eq('tenant_id', tenantId)
+          .eq('due_date', dueDate)
+          .limit(1)
+          .single()
+        
+        if (existingPayment) {
+          // Update only the utilities field
+          console.log('Updating utilities status only:', {
+            id: existingPayment.id,
+            utilities_paid: checked
+          })
+          
+          const { error } = await supabase
+            .from('rent_payments')
+            .update({
+              utilities_paid: checked
+            })
+            .eq('id', existingPayment.id)
+            
+          if (error) throw error
+        } else {
+          // Create new record with all current values
+          console.log('Creating new payment record (utilities):', {
             tenant_id: tenantId,
             amount: monthlyRent,
             due_date: dueDate,
+            is_paid: localRentPaid,
             utilities_paid: checked,
-            // Don't include is_paid and paid_date here - only update what was changed
-          }, {
-            onConflict: 'tenant_id,due_date'
+            paid_date: localRentPaid ? new Date().toISOString().split('T')[0] : null
           })
           
-        if (error) {
-          console.error('Supabase upsert error:', error)
-          throw error
+          const { error } = await supabase
+            .from('rent_payments')
+            .insert({
+              tenant_id: tenantId,
+              amount: monthlyRent,
+              due_date: dueDate,
+              is_paid: localRentPaid,
+              utilities_paid: checked,
+              paid_date: localRentPaid ? new Date().toISOString().split('T')[0] : null
+            })
+            
+          if (error) throw error
         }
       } else {
         // Update existing payment record
