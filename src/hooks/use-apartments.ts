@@ -94,6 +94,7 @@ export function useTenants() {
           rooms:room_id (
             room_number,
             monthly_rent,
+            apartment_id,
             apartments:apartment_id (name, address)
           )
         `)
@@ -101,7 +102,7 @@ export function useTenants() {
       
       if (error) throw error
       return data as (Tenant & { 
-        rooms: Room & { apartments: Pick<Apartment, 'name' | 'address'> } 
+        rooms: Room & { apartment_id: string; apartments: Pick<Apartment, 'name' | 'address'> } 
       })[]
     },
   })
@@ -140,10 +141,51 @@ export function useCreateApartment() {
   const queryClient = useQueryClient()
   
   return useMutation({
-    mutationFn: async (apartment: Omit<Apartment, 'id' | 'created_at' | 'updated_at' | 'bills_paid_until'> & { bills_paid_until?: string | null }) => {
+    mutationFn: async (data: { name: string; address: string; total_rooms: number; monthly_bills: number; rooms: { room_number: string; monthly_rent: number }[] }) => {
+      // First create the apartment
+      const { data: apartment, error: apartmentError } = await supabase
+        .from('apartments')
+        .insert({
+          name: data.name,
+          address: data.address,
+          total_rooms: data.total_rooms,
+          monthly_bills: data.monthly_bills
+        })
+        .select()
+        .single()
+      
+      if (apartmentError) throw apartmentError
+
+      // Then create the rooms
+      const roomsToInsert = data.rooms.map(room => ({
+        apartment_id: apartment.id,
+        room_number: room.room_number,
+        monthly_rent: room.monthly_rent
+      }))
+
+      const { error: roomsError } = await supabase
+        .from('rooms')
+        .insert(roomsToInsert)
+
+      if (roomsError) throw roomsError
+
+      return apartment
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["apartments"] })
+      queryClient.invalidateQueries({ queryKey: ["rooms"] })
+    }
+  })
+}
+
+export function useCreateTenant() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: async (tenant: Omit<Tenant, 'id' | 'created_at' | 'updated_at'>) => {
       const { data, error } = await supabase
-        .from("apartments")
-        .insert(apartment)
+        .from('tenants')
+        .insert(tenant)
         .select()
         .single()
       
@@ -151,7 +193,8 @@ export function useCreateApartment() {
       return data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["apartments"] })
-    },
+      queryClient.invalidateQueries({ queryKey: ["tenants"] })
+      queryClient.invalidateQueries({ queryKey: ["rooms"] })
+    }
   })
 }

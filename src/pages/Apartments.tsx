@@ -24,7 +24,10 @@ const Apartments = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      await createApartment.mutateAsync(formData)
+      await createApartment.mutateAsync({
+        ...formData,
+        rooms: []
+      })
       setIsDialogOpen(false)
       setFormData({ name: "", address: "", total_rooms: 0, monthly_bills: 0 })
       toast({
