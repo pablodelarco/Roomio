@@ -12,13 +12,19 @@ interface PaymentStatusPopoverProps {
   isRentPaid: boolean
   isUtilitiesPaid: boolean
   tenantName: string
+  tenantId?: string
+  selectedMonth?: string
+  monthlyRent?: number
 }
 
 export function PaymentStatusPopover({ 
   paymentId, 
   isRentPaid,
   isUtilitiesPaid, 
-  tenantName 
+  tenantName,
+  tenantId,
+  selectedMonth,
+  monthlyRent
 }: PaymentStatusPopoverProps) {
   const [open, setOpen] = useState(false)
   const updatePayment = useUpdateRentPayment()
@@ -26,11 +32,28 @@ export function PaymentStatusPopover({
 
   const handleRentToggle = async (checked: boolean) => {
     try {
-      await updatePayment.mutateAsync({
-        id: paymentId,
-        is_paid: checked,
-        paid_date: checked ? new Date().toISOString().split('T')[0] : null
-      })
+      if (paymentId.includes('-')) {
+        // Create new payment record
+        const { supabase } = await import("@/integrations/supabase/client")
+        const dueDate = `${selectedMonth}-01`
+        
+        await supabase
+          .from('rent_payments')
+          .insert({
+            tenant_id: tenantId,
+            amount: monthlyRent,
+            due_date: dueDate,
+            is_paid: checked,
+            paid_date: checked ? new Date().toISOString().split('T')[0] : null
+          })
+      } else {
+        // Update existing payment record
+        await updatePayment.mutateAsync({
+          id: paymentId,
+          is_paid: checked,
+          paid_date: checked ? new Date().toISOString().split('T')[0] : null
+        })
+      }
       
       toast({
         description: `${tenantName} rent ${checked ? 'paid' : 'pending'}`,
@@ -48,10 +71,27 @@ export function PaymentStatusPopover({
 
   const handleUtilitiesToggle = async (checked: boolean) => {
     try {
-      await updatePayment.mutateAsync({
-        id: paymentId,
-        utilities_paid: checked
-      })
+      if (paymentId.includes('-')) {
+        // Create new payment record
+        const { supabase } = await import("@/integrations/supabase/client")
+        const dueDate = `${selectedMonth}-01`
+        
+        await supabase
+          .from('rent_payments')
+          .insert({
+            tenant_id: tenantId,
+            amount: monthlyRent,
+            due_date: dueDate,
+            is_paid: false,
+            utilities_paid: checked
+          })
+      } else {
+        // Update existing payment record
+        await updatePayment.mutateAsync({
+          id: paymentId,
+          utilities_paid: checked
+        })
+      }
       
       toast({
         description: `${tenantName} utilities ${checked ? 'paid' : 'pending'}`,

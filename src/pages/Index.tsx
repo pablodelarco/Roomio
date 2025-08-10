@@ -239,14 +239,16 @@ const Index = () => {
                         </div>
                       </div>
                       
-                      {tenantPayment && (
-                        <PaymentStatusPopover
-                          paymentId={tenantPayment.id}
-                          isRentPaid={isRentPaid}
-                          isUtilitiesPaid={isUtilitiesPaid}
-                          tenantName={`${tenant.first_name} ${tenant.last_name}`}
-                        />
-                      )}
+                      {/* Always show the payment menu for every month */}
+                      <PaymentStatusPopover
+                        paymentId={tenantPayment?.id || `${tenant.id}-${selectedMonth}`}
+                        isRentPaid={isRentPaid}
+                        isUtilitiesPaid={isUtilitiesPaid}
+                        tenantName={`${tenant.first_name} ${tenant.last_name}`}
+                        tenantId={tenant.id}
+                        selectedMonth={selectedMonth}
+                        monthlyRent={amount}
+                      />
                     </div>
                   </div>
                 )
