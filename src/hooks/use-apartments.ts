@@ -45,6 +45,7 @@ export type RentPayment = {
   due_date: string
   paid_date: string | null
   is_paid: boolean
+  utilities_paid: boolean
   payment_method: string | null
   notes: string | null
   created_at: string
@@ -259,10 +260,15 @@ export function useUpdateRentPayment() {
   const queryClient = useQueryClient()
   
   return useMutation({
-    mutationFn: async ({ id, is_paid, paid_date }: { id: string; is_paid: boolean; paid_date?: string }) => {
+    mutationFn: async ({ id, is_paid, utilities_paid, paid_date }: { id: string; is_paid?: boolean; utilities_paid?: boolean; paid_date?: string }) => {
+      const updateData: any = {}
+      if (is_paid !== undefined) updateData.is_paid = is_paid
+      if (utilities_paid !== undefined) updateData.utilities_paid = utilities_paid
+      if (paid_date !== undefined) updateData.paid_date = paid_date
+      
       const { error } = await supabase
         .from('rent_payments')
-        .update({ is_paid, paid_date })
+        .update(updateData)
         .eq('id', id)
       
       if (error) throw error

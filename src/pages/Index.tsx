@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useApartments, useTenants, useRentPayments, useUpdateRentPayment } from "@/hooks/use-apartments"
 import { EditTenantDialog } from "@/components/forms/EditTenantDialog"
+import { PaymentStatusPopover } from "@/components/PaymentStatusPopover"
 import { useToast } from "@/hooks/use-toast"
 import { format } from "date-fns"
 
@@ -139,20 +140,14 @@ const Index = () => {
             <div className="space-y-2">
               {apartmentTenants.map((tenant) => {
                 const tenantPayment = currentMonthPayments.find(p => p.tenant_id === tenant.id)
-                const isPaid = tenantPayment?.is_paid || false
+                const isRentPaid = tenantPayment?.is_paid || false
+                const isUtilitiesPaid = tenantPayment?.utilities_paid || false
                 const amount = tenant.rooms.monthly_rent
                 
-                const handleLocalPaymentToggle = async (e: React.MouseEvent) => {
-                  e.stopPropagation()
-                  if (tenantPayment) {
-                    await handlePaymentToggle(tenant.id, isPaid)
-                  }
-                }
-                
                 return (
-                  <EditTenantDialog key={tenant.id} tenant={tenant}>
-                    <div className="bg-muted rounded-lg p-3 flex items-center justify-between cursor-pointer hover:bg-muted/70 transition-colors">
-                      <div className="flex items-center gap-3">
+                  <div key={tenant.id} className="bg-muted rounded-lg p-3 flex items-center justify-between">
+                    <EditTenantDialog tenant={tenant}>
+                      <div className="flex items-center gap-3 cursor-pointer flex-1 hover:bg-muted/70 transition-colors p-2 rounded">
                         <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs">
                           {tenant.first_name[0]}{tenant.last_name[0]}
                         </div>
@@ -161,16 +156,33 @@ const Index = () => {
                           <div className="text-muted-foreground text-xs">Room {tenant.rooms.room_number} • €{amount}.00/month</div>
                         </div>
                       </div>
-                        <div className="text-right">
-                          <div className="font-bold text-foreground text-sm">€{amount}.00</div>
-                          <div className={`text-xs px-2 py-1 rounded ${
-                            isPaid ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'
-                          }`}>
-                            {isPaid ? 'Paid' : 'Pending'}
-                          </div>
+                    </EditTenantDialog>
+                    
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <div className="font-bold text-foreground text-sm">€{amount}.00</div>
+                        <div className="text-xs text-muted-foreground">
+                          Rent: <span className={isRentPaid ? 'text-green-500' : 'text-red-500'}>
+                            {isRentPaid ? 'Paid' : 'Pending'}
+                          </span>
                         </div>
+                        <div className="text-xs text-muted-foreground">
+                          Utils: <span className={isUtilitiesPaid ? 'text-blue-500' : 'text-orange-500'}>
+                            {isUtilitiesPaid ? 'Paid' : 'Pending'}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {tenantPayment && (
+                        <PaymentStatusPopover
+                          paymentId={tenantPayment.id}
+                          isRentPaid={isRentPaid}
+                          isUtilitiesPaid={isUtilitiesPaid}
+                          tenantName={`${tenant.first_name} ${tenant.last_name}`}
+                        />
+                      )}
                     </div>
-                  </EditTenantDialog>
+                  </div>
                 )
               })}
               
