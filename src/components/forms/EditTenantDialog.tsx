@@ -269,34 +269,16 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
-            <div>
-              <Label htmlFor="deposit" className="text-xs">Deposit Amount</Label>
-              <Input
-                id="deposit"
-                type="number"
-                step="0.01"
-                value={formData.deposit_amount}
-                onChange={(e) => setFormData({ ...formData, deposit_amount: e.target.value })}
-                className="h-8"
-              />
-            </div>
-            <div className="flex items-center justify-between pt-4">
-              <Label htmlFor="deposit_paid" className="text-xs">Deposit Paid</Label>
-              <Switch
-                id="deposit_paid"
-                checked={formData.deposit_paid}
-                onCheckedChange={(checked) => setFormData({ ...formData, deposit_paid: checked })}
-              />
-            </div>
-            <div className="flex items-center justify-between pt-4">
-              <Label htmlFor="deposit_returned" className="text-xs">Deposit Returned</Label>
-              <Switch
-                id="deposit_returned"
-                checked={formData.deposit_returned}
-                onCheckedChange={(checked) => setFormData({ ...formData, deposit_returned: checked })}
-              />
-            </div>
+          <div>
+            <Label htmlFor="deposit" className="text-xs">Deposit Amount</Label>
+            <Input
+              id="deposit"
+              type="number"
+              step="0.01"
+              value={formData.deposit_amount}
+              onChange={(e) => setFormData({ ...formData, deposit_amount: e.target.value })}
+              className="h-8"
+            />
           </div>
 
           <div className="flex items-center justify-between py-3 border-t">
