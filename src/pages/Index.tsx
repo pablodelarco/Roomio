@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import { Building2, Users, DollarSign, TrendingUp, AlertTriangle, Calendar, Plus, Home, UserPlus, Receipt, ChevronDown, Check, X, Edit } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -12,14 +12,16 @@ import { PaymentStatusPopover } from "@/components/PaymentStatusPopover"
 import { BillStatusPopover } from "@/components/BillStatusPopover"
 import { useToast } from "@/hooks/use-toast"
 import { format } from "date-fns"
+import { supabase } from "@/integrations/supabase/client"
 
 const Index = () => {
   const [selectedApartmentId, setSelectedApartmentId] = useState<string>("all")
   const [selectedMonth, setSelectedMonth] = useState<string>(new Date().toISOString().slice(0, 7)) // YYYY-MM format
+  const [optimisticPayments, setOptimisticPayments] = useState<Map<string, { isRentPaid: boolean; isUtilitiesPaid: boolean }>>(new Map())
   
   const { data: apartments = [] } = useApartments()
   const { data: tenants = [] } = useTenants()
-  const { data: payments = [] } = useRentPayments()
+  const { data: payments = [], refetch: refetchPayments } = useRentPayments()
   const updatePayment = useUpdateRentPayment()
   const { toast } = useToast()
 
@@ -40,6 +42,46 @@ const Index = () => {
 
   const monthOptions = generateMonthOptions()
   const selectedMonthLabel = monthOptions.find(option => option.value === selectedMonth)?.label || "Select Month"
+
+  // Set up real-time subscription for instant updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('rent_payments_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'rent_payments'
+        },
+        (payload) => {
+          console.log('Real-time update received:', payload)
+          // Force refresh data when changes occur
+          refetchPayments()
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [refetchPayments])
+
+  // Optimistic update handler
+  const handleOptimisticUpdate = useCallback((tenantId: string, updates: { isRentPaid?: boolean; isUtilitiesPaid?: boolean }) => {
+    setOptimisticPayments(prev => {
+      const key = `${tenantId}-${selectedMonth}`
+      const existing = prev.get(key) || { isRentPaid: false, isUtilitiesPaid: false }
+      const newMap = new Map(prev)
+      newMap.set(key, { ...existing, ...updates })
+      return newMap
+    })
+  }, [selectedMonth])
+
+  // Clear optimistic updates when month changes
+  useEffect(() => {
+    setOptimisticPayments(new Map())
+  }, [selectedMonth])
 
   const handlePaymentToggle = async (tenantId: string, currentStatus: boolean) => {
     const payment = currentMonthPayments.find(p => p.tenant_id === tenantId)
@@ -88,15 +130,20 @@ const Index = () => {
   const paidPayments = currentMonthPayments.filter(p => p.is_paid)
   const pendingPayments = currentMonthPayments.filter(p => !p.is_paid)
   
-  // Calculate rent properly based on actual tenants and their latest payment status
+  // Calculate rent properly based on actual tenants and their latest payment status (with optimistic updates)
   let totalRentDue = 0
   let totalReceived = 0
   
   apartmentTenants.forEach(tenant => {
     const monthlyRent = tenant.rooms.monthly_rent
     const tenantPayment = currentMonthPayments.find(p => p.tenant_id === tenant.id)
+    const optimisticKey = `${tenant.id}-${selectedMonth}`
+    const optimisticData = optimisticPayments.get(optimisticKey)
     
-    if (tenantPayment?.is_paid) {
+    // Use optimistic data if available, otherwise use actual data
+    const isRentPaid = optimisticData?.isRentPaid ?? (tenantPayment?.is_paid || false)
+    
+    if (isRentPaid) {
       totalReceived += monthlyRent
     } else {
       totalRentDue += monthlyRent
@@ -206,8 +253,12 @@ const Index = () => {
             <div className="space-y-2">
               {apartmentTenants.map((tenant) => {
                 const tenantPayment = currentMonthPayments.find(p => p.tenant_id === tenant.id)
-                const isRentPaid = tenantPayment?.is_paid || false
-                const isUtilitiesPaid = tenantPayment?.utilities_paid || false
+                const optimisticKey = `${tenant.id}-${selectedMonth}`
+                const optimisticData = optimisticPayments.get(optimisticKey)
+                
+                // Use optimistic data for instant UI updates
+                const isRentPaid = optimisticData?.isRentPaid ?? (tenantPayment?.is_paid || false)
+                const isUtilitiesPaid = optimisticData?.isUtilitiesPaid ?? (tenantPayment?.utilities_paid || false)
                 const amount = tenant.rooms.monthly_rent
                 
                 return (
@@ -248,6 +299,16 @@ const Index = () => {
                         tenantId={tenant.id}
                         selectedMonth={selectedMonth}
                         monthlyRent={amount}
+                        onUpdate={() => {
+                          // Clear optimistic state after successful update
+                          setOptimisticPayments(prev => {
+                            const newMap = new Map(prev)
+                            newMap.delete(`${tenant.id}-${selectedMonth}`)
+                            return newMap
+                          })
+                          refetchPayments()
+                        }}
+                        onOptimisticUpdate={handleOptimisticUpdate}
                       />
                     </div>
                   </div>

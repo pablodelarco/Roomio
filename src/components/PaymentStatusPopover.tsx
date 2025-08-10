@@ -16,6 +16,7 @@ interface PaymentStatusPopoverProps {
   selectedMonth?: string
   monthlyRent?: number
   onUpdate?: () => void // Add callback to trigger parent refresh
+  onOptimisticUpdate?: (tenantId: string, updates: { isRentPaid?: boolean; isUtilitiesPaid?: boolean }) => void
 }
 
 export function PaymentStatusPopover({ 
@@ -26,7 +27,8 @@ export function PaymentStatusPopover({
   tenantId,
   selectedMonth,
   monthlyRent,
-  onUpdate
+  onUpdate,
+  onOptimisticUpdate
 }: PaymentStatusPopoverProps) {
   const [open, setOpen] = useState(false)
   const [localRentPaid, setLocalRentPaid] = useState(isRentPaid)
@@ -45,7 +47,12 @@ export function PaymentStatusPopover({
   const handleRentToggle = async (checked: boolean) => {
     if (isUpdating) return // Prevent multiple simultaneous updates
     
-    // Immediately update local state for instant UI feedback
+    // Immediately update optimistic state across the app
+    if (tenantId && onOptimisticUpdate) {
+      onOptimisticUpdate(tenantId, { isRentPaid: checked })
+    }
+    
+    // Also update local state for the switch
     setLocalRentPaid(checked)
     setIsUpdating(true)
     
@@ -88,7 +95,10 @@ export function PaymentStatusPopover({
       // Close popover after successful update
       setTimeout(() => setOpen(false), 500)
     } catch (error) {
-      // Revert local state on error
+      // Revert optimistic state on error
+      if (tenantId && onOptimisticUpdate) {
+        onOptimisticUpdate(tenantId, { isRentPaid: !checked })
+      }
       setLocalRentPaid(!checked)
       console.error('Error updating rent payment:', error)
       toast({
@@ -104,7 +114,12 @@ export function PaymentStatusPopover({
   const handleUtilitiesToggle = async (checked: boolean) => {
     if (isUpdating) return // Prevent multiple simultaneous updates
     
-    // Immediately update local state for instant UI feedback
+    // Immediately update optimistic state across the app
+    if (tenantId && onOptimisticUpdate) {
+      onOptimisticUpdate(tenantId, { isUtilitiesPaid: checked })
+    }
+    
+    // Also update local state for the switch
     setLocalUtilitiesPaid(checked)
     setIsUpdating(true)
     
@@ -146,7 +161,10 @@ export function PaymentStatusPopover({
       // Close popover after successful update
       setTimeout(() => setOpen(false), 500)
     } catch (error) {
-      // Revert local state on error
+      // Revert optimistic state on error
+      if (tenantId && onOptimisticUpdate) {
+        onOptimisticUpdate(tenantId, { isUtilitiesPaid: !checked })
+      }
       setLocalUtilitiesPaid(!checked)
       console.error('Error updating utilities payment:', error)
       toast({
