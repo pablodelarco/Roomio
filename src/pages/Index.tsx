@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Building2, Users, DollarSign, TrendingUp, AlertTriangle, Calendar, Plus, Home, UserPlus, Receipt, ChevronDown, Check, X } from "lucide-react"
+import { Building2, Users, DollarSign, TrendingUp, AlertTriangle, Calendar, Plus, Home, UserPlus, Receipt, ChevronDown, Check, X, Edit } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -7,8 +7,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useApartments, useTenants, useRentPayments, useUpdateRentPayment } from "@/hooks/use-apartments"
-import { AddTenantDialog } from "@/components/forms/AddTenantDialog"
-import { AddApartmentDialog } from "@/components/forms/AddApartmentDialog"
+import { EditTenantDialog } from "@/components/forms/EditTenantDialog"
 import { useToast } from "@/hooks/use-toast"
 import { format } from "date-fns"
 
@@ -85,10 +84,6 @@ const Index = () => {
           <h1 className="text-3xl font-bold text-white">
             August 2025
           </h1>
-          <div className="flex items-center gap-3">
-            <AddApartmentDialog />
-            <AddTenantDialog />
-          </div>
         </div>
 
         {/* Apartment Selector */}
@@ -190,6 +185,16 @@ const Index = () => {
                           <X className="h-4 w-4 mr-2" />
                           Mark as Pending
                         </Button>
+                        <EditTenantDialog tenant={tenant}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="w-full justify-start text-blue-500 hover:bg-blue-500/10"
+                          >
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit Tenant
+                          </Button>
+                        </EditTenantDialog>
                       </div>
                     </PopoverContent>
                   </Popover>
@@ -209,10 +214,7 @@ const Index = () => {
           <div className="bg-card rounded-xl p-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-foreground">Bills Status</h2>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg flex items-center gap-2 text-sm">
-                <Plus className="h-3 w-3" />
-                Add Bill
-              </Button>
+              <span className="text-muted-foreground text-sm">August 2025</span>
             </div>
             
             <div className="space-y-2">

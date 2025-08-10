@@ -10,6 +10,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import Index from "./pages/Index";
 import Apartments from "./pages/Apartments";
 import Tenants from "./pages/Tenants";
+import Bills from "./pages/Bills";
 import Payments from "./pages/Payments";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
@@ -37,6 +38,7 @@ const App = () => (
                     <Route path="/" element={<Index />} />
                     <Route path="/apartments" element={<Apartments />} />
                     <Route path="/tenants" element={<Tenants />} />
+                    <Route path="/bills" element={<Bills />} />
                     <Route path="/payments" element={<Payments />} />
                     <Route path="/reports" element={<Reports />} />
                     <Route path="/settings" element={<Settings />} />

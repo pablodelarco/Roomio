@@ -1,4 +1,4 @@
-import { Building2, Home, Users, CreditCard, Settings, BarChart3 } from "lucide-react"
+import { Building2, Home, Users, CreditCard, Settings, BarChart3, Receipt } from "lucide-react"
 import { NavLink, useLocation } from "react-router-dom"
 
 import {
@@ -16,6 +16,7 @@ const navigationItems = [
   { title: "Dashboard", url: "/", icon: Home },
   { title: "Apartments", url: "/apartments", icon: Building2 },
   { title: "Tenants", url: "/tenants", icon: Users },
+  { title: "Bills", url: "/bills", icon: Receipt },
   { title: "Payments", url: "/payments", icon: CreditCard },
   { title: "Reports", url: "/reports", icon: BarChart3 },
   { title: "Settings", url: "/settings", icon: Settings },

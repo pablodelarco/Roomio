@@ -289,3 +289,47 @@ export function useUpdateApartment() {
     },
   })
 }
+
+export function useUpdateTenant() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: async (tenant: { 
+      id: string
+      first_name: string
+      last_name: string
+      email: string | null
+      phone: string | null
+      room_id: string
+      lease_start: string
+      lease_end: string | null
+      deposit_amount: number | null
+      deposit_paid: boolean
+    }) => {
+      const { data, error } = await supabase
+        .from('tenants')
+        .update({
+          first_name: tenant.first_name,
+          last_name: tenant.last_name,
+          email: tenant.email,
+          phone: tenant.phone,
+          room_id: tenant.room_id,
+          lease_start: tenant.lease_start,
+          lease_end: tenant.lease_end,
+          deposit_amount: tenant.deposit_amount,
+          deposit_paid: tenant.deposit_paid,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', tenant.id)
+        .select()
+        .single()
+      
+      if (error) throw error
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tenants'] })
+      queryClient.invalidateQueries({ queryKey: ['rooms'] })
+    },
+  })
+}
