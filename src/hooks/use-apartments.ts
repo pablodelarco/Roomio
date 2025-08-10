@@ -259,33 +259,94 @@ export function useUpdateApartment() {
   const queryClient = useQueryClient()
   
   return useMutation({
-    mutationFn: async (apartment: { 
-      id: string
-      name: string
-      address: string
-      total_rooms: number
-      monthly_bills: number
-      bills_paid_until?: string
+    mutationFn: async (data: { 
+      apartment: {
+        id: string
+        name: string
+        address: string
+        total_rooms: number
+        monthly_bills: number
+        bills_paid_until?: string
+      }
+      rooms: {
+        id?: string
+        room_number: string
+        monthly_rent: number
+      }[]
     }) => {
-      const { data, error } = await supabase
+      // Update apartment
+      const { data: apartmentData, error: apartmentError } = await supabase
         .from('apartments')
         .update({
-          name: apartment.name,
-          address: apartment.address,
-          total_rooms: apartment.total_rooms,
-          monthly_bills: apartment.monthly_bills,
-          bills_paid_until: apartment.bills_paid_until,
+          name: data.apartment.name,
+          address: data.apartment.address,
+          total_rooms: data.apartment.total_rooms,
+          monthly_bills: data.apartment.monthly_bills,
+          bills_paid_until: data.apartment.bills_paid_until,
           updated_at: new Date().toISOString()
         })
-        .eq('id', apartment.id)
+        .eq('id', data.apartment.id)
         .select()
         .single()
       
-      if (error) throw error
-      return data
+      if (apartmentError) throw apartmentError
+
+      // Get existing rooms for this apartment
+      const { data: existingRooms, error: roomsError } = await supabase
+        .from('rooms')
+        .select('id')
+        .eq('apartment_id', data.apartment.id)
+
+      if (roomsError) throw roomsError
+
+      const existingRoomIds = existingRooms.map(room => room.id)
+      const updatedRoomIds = data.rooms.filter(room => room.id).map(room => room.id)
+      
+      // Delete rooms that are no longer in the list
+      const roomsToDelete = existingRoomIds.filter(id => !updatedRoomIds.includes(id))
+      if (roomsToDelete.length > 0) {
+        const { error: deleteError } = await supabase
+          .from('rooms')
+          .delete()
+          .in('id', roomsToDelete)
+        
+        if (deleteError) throw deleteError
+      }
+
+      // Update existing rooms and insert new ones
+      for (const room of data.rooms) {
+        if (room.id) {
+          // Update existing room
+          const { error: updateError } = await supabase
+            .from('rooms')
+            .update({
+              room_number: room.room_number,
+              monthly_rent: room.monthly_rent,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', room.id)
+          
+          if (updateError) throw updateError
+        } else {
+          // Insert new room
+          const { error: insertError } = await supabase
+            .from('rooms')
+            .insert({
+              apartment_id: data.apartment.id,
+              room_number: room.room_number,
+              monthly_rent: room.monthly_rent
+            })
+          
+          if (insertError) throw insertError
+        }
+      }
+
+      return apartmentData
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['apartments'] })
+      queryClient.invalidateQueries({ queryKey: ['rooms'] })
+      queryClient.invalidateQueries({ queryKey: ['tenants'] })
     },
   })
 }

@@ -94,12 +94,20 @@ export function EditApartmentDialog({ apartment, children }: EditApartmentDialog
     }
 
     try {
+      
       await updateApartment.mutateAsync({
-        id: apartment.id,
-        name: formData.name,
-        address: formData.address,
-        total_rooms: validRooms.length,
-        monthly_bills: formData.monthly_bills ? parseFloat(formData.monthly_bills) : 0
+        apartment: {
+          id: apartment.id,
+          name: formData.name,
+          address: formData.address,
+          total_rooms: validRooms.length,
+          monthly_bills: formData.monthly_bills ? parseFloat(formData.monthly_bills) : 0
+        },
+        rooms: validRooms.map(room => ({
+          id: room.id,
+          room_number: room.room_number,
+          monthly_rent: parseFloat(room.monthly_rent)
+        }))
       })
 
       toast({
