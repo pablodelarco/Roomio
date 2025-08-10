@@ -61,7 +61,7 @@ const Index = () => {
   const paidPayments = currentMonthPayments.filter(p => p.is_paid)
   const pendingPayments = currentMonthPayments.filter(p => !p.is_paid)
   
-  const totalRentDue = currentMonthPayments.reduce((sum, p) => sum + p.amount, 0)
+  const totalRentDue = pendingPayments.reduce((sum, p) => sum + p.amount, 0)
   const totalReceived = paidPayments.reduce((sum, p) => sum + p.amount, 0)
   const totalBillsDue = selectedApartment ? selectedApartment.monthly_bills : apartments.reduce((sum, apt) => sum + apt.monthly_bills, 0)
   const overdueCount = pendingPayments.filter(p => new Date(p.due_date) < new Date()).length
