@@ -5,16 +5,42 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useApartments, useTenants, useRentPayments } from "@/hooks/use-apartments"
+import { useApartments, useTenants, useRentPayments, useUpdateRentPayment } from "@/hooks/use-apartments"
 import { AddTenantDialog } from "@/components/forms/AddTenantDialog"
 import { AddApartmentDialog } from "@/components/forms/AddApartmentDialog"
+import { useToast } from "@/hooks/use-toast"
 import { format } from "date-fns"
 
 const Index = () => {
   const { data: apartments = [] } = useApartments()
   const { data: tenants = [] } = useTenants()
   const { data: payments = [] } = useRentPayments()
+  const updatePayment = useUpdateRentPayment()
+  const { toast } = useToast()
   const [selectedApartmentId, setSelectedApartmentId] = useState<string>("all")
+
+  const handlePaymentToggle = async (tenantId: string, currentStatus: boolean) => {
+    const payment = currentMonthPayments.find(p => p.tenant_id === tenantId)
+    if (payment) {
+      try {
+        await updatePayment.mutateAsync({
+          id: payment.id,
+          is_paid: !currentStatus,
+          paid_date: !currentStatus ? new Date().toISOString().split('T')[0] : undefined
+        })
+        toast({
+          title: "Success",
+          description: `Payment marked as ${!currentStatus ? 'paid' : 'pending'}`,
+        })
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to update payment status",
+          variant: "destructive",
+        })
+      }
+    }
+  }
 
   // Filter data by selected apartment
   const selectedApartment = apartments.find(apt => apt.id === selectedApartmentId)
@@ -53,14 +79,20 @@ const Index = () => {
   return (
       <div className="min-h-screen bg-[#0a0a0a] text-white">
       {/* Header with prominent month display */}
-      <div className="px-8 pt-8 pb-6">
-        <h1 className="text-4xl font-bold text-white mb-8">
-          August 2025
-        </h1>
+      <div className="px-6 pt-6 pb-4">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold text-white">
+            August 2025
+          </h1>
+          <div className="flex items-center gap-3">
+            <AddApartmentDialog />
+            <AddTenantDialog />
+          </div>
+        </div>
 
         {/* Apartment Selector */}
         {apartments.length > 0 && (
-          <div className="mb-6">
+          <div className="mb-4">
             <Select value={selectedApartmentId} onValueChange={setSelectedApartmentId}>
               <SelectTrigger className="w-48 bg-[#1a1a1a] border-[#333] text-white">
                 <SelectValue />
@@ -76,64 +108,65 @@ const Index = () => {
         )}
 
         {/* Stats Row */}
-        <div className="grid grid-cols-5 gap-6 mb-8">
+        <div className="grid grid-cols-5 gap-4 mb-6">
           <div className="text-center">
-            <div className="text-3xl font-bold text-white">€{totalRentDue.toLocaleString()}</div>
-            <div className="text-gray-400 text-sm">Rent Due</div>
+            <div className="text-2xl font-bold text-white">€{totalRentDue.toLocaleString()}</div>
+            <div className="text-gray-400 text-xs">Rent Due</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-green-500">€{totalReceived.toLocaleString()}</div>
-            <div className="text-gray-400 text-sm">Received</div>
+            <div className="text-2xl font-bold text-green-500">€{totalReceived.toLocaleString()}</div>
+            <div className="text-gray-400 text-xs">Received</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-orange-500">€{totalBillsDue.toLocaleString()}</div>
-            <div className="text-gray-400 text-sm">Bills Due</div>
+            <div className="text-2xl font-bold text-orange-500">€{totalBillsDue.toLocaleString()}</div>
+            <div className="text-gray-400 text-xs">Bills Due</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-red-500">{overdueCount}</div>
-            <div className="text-gray-400 text-sm">Overdue</div>
+            <div className="text-2xl font-bold text-red-500">{overdueCount}</div>
+            <div className="text-gray-400 text-xs">Overdue</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-blue-500">{occupancyRate}%</div>
-            <div className="text-gray-400 text-sm">Occupancy</div>
+            <div className="text-2xl font-bold text-blue-500">{occupancyRate}%</div>
+            <div className="text-gray-400 text-xs">Occupancy</div>
           </div>
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-2 gap-8">
+        <div className="grid grid-cols-2 gap-6">
           {/* Tenant Rent Status */}
-          <div className="bg-[#1a1a1a] rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-white">Tenant Rent Status</h2>
+          <div className="bg-[#1a1a1a] rounded-xl p-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-white">Tenant Rent Status</h2>
               <span className="text-gray-400 text-sm">August 2025</span>
             </div>
             
-            <div className="space-y-4">
+            <div className="space-y-2">
               {apartmentTenants.map((tenant) => {
                 const tenantPayment = currentMonthPayments.find(p => p.tenant_id === tenant.id)
                 const isPaid = tenantPayment?.is_paid || false
                 const amount = tenant.rooms.monthly_rent
                 
                 return (
-                  <div key={tenant.id} className="bg-[#2a2a2a] rounded-xl p-4 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                  <div 
+                    key={tenant.id} 
+                    className="bg-[#2a2a2a] rounded-lg p-3 flex items-center justify-between cursor-pointer hover:bg-[#333] transition-colors"
+                    onClick={() => handlePaymentToggle(tenant.id, isPaid)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs">
                         {tenant.first_name[0]}{tenant.last_name[0]}
                       </div>
                       <div>
-                        <div className="font-semibold text-white">{tenant.first_name} {tenant.last_name}</div>
-                        <div className="text-gray-400 text-sm">Room {tenant.rooms.room_number} • €{amount}.00/month</div>
+                        <div className="font-medium text-white text-sm">{tenant.first_name} {tenant.last_name}</div>
+                        <div className="text-gray-400 text-xs">Room {tenant.rooms.room_number} • €{amount}.00/month</div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <div className="text-right">
-                        <div className="font-bold text-white">€{amount}.00</div>
-                        <div className={`text-xs px-2 py-1 rounded flex items-center gap-1 ${
-                          isPaid ? 'text-green-500' : 'text-red-500'
-                        }`}>
-                          {isPaid && <div className="w-2 h-2 rounded-full bg-green-500"></div>}
-                          {isPaid ? 'Paid' : 'Pending'}
-                        </div>
+                    <div className="text-right">
+                      <div className="font-bold text-white text-sm">€{amount}.00</div>
+                      <div className={`text-xs px-2 py-1 rounded ${
+                        isPaid ? 'text-green-500' : 'text-red-500'
+                      }`}>
+                        {isPaid ? 'Paid' : 'Pending'}
                       </div>
                     </div>
                   </div>
@@ -142,47 +175,45 @@ const Index = () => {
               
               {apartmentTenants.length === 0 && (
                 <div className="text-center py-8">
-                  <Users className="h-12 w-12 text-gray-600 mx-auto mb-3" />
-                  <p className="text-gray-400">No tenants in this property</p>
+                  <Users className="h-8 w-8 text-gray-600 mx-auto mb-2" />
+                  <p className="text-gray-400 text-sm">No tenants in this property</p>
                 </div>
               )}
             </div>
           </div>
 
           {/* Bills Status */}
-          <div className="bg-[#1a1a1a] rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-white">Bills Status</h2>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
-                <Plus className="h-4 w-4" />
+          <div className="bg-[#1a1a1a] rounded-xl p-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-white">Bills Status</h2>
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg flex items-center gap-2 text-sm">
+                <Plus className="h-3 w-3" />
                 Add Bill
               </Button>
             </div>
             
-            <div className="space-y-4">
+            <div className="space-y-2">
               {mockBills.map((bill) => {
                 const isPaid = bill.status === 'paid'
                 const isOverdue = new Date(bill.dueDate) < new Date() && !isPaid
                 
                 return (
-                  <div key={bill.id} className="bg-[#2a2a2a] rounded-xl p-4 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center text-white font-bold text-sm">
+                  <div key={bill.id} className="bg-[#2a2a2a] rounded-lg p-3 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-white font-bold text-xs">
                         {bill.name.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <div className="font-semibold text-white">{bill.name}</div>
-                        <div className="text-gray-400 text-sm">{bill.type} • Due {format(new Date(bill.dueDate), "M/d/yyyy")}</div>
+                        <div className="font-medium text-white text-sm">{bill.name}</div>
+                        <div className="text-gray-400 text-xs">{bill.type} • Due {format(new Date(bill.dueDate), "M/d/yyyy")}</div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <div className="text-right">
-                        <div className="font-bold text-white">€{bill.amount}</div>
-                        <div className={`text-xs px-2 py-1 rounded ${
-                          isPaid ? 'text-green-500' : isOverdue ? 'text-red-500' : 'text-orange-500'
-                        }`}>
-                          {isPaid ? 'Paid' : isOverdue ? 'Overdue' : 'Pending'}
-                        </div>
+                    <div className="text-right">
+                      <div className="font-bold text-white text-sm">€{bill.amount}</div>
+                      <div className={`text-xs px-2 py-1 rounded ${
+                        isPaid ? 'text-green-500' : isOverdue ? 'text-red-500' : 'text-orange-500'
+                      }`}>
+                        {isPaid ? 'Paid' : isOverdue ? 'Overdue' : 'Pending'}
                       </div>
                     </div>
                   </div>
@@ -191,8 +222,8 @@ const Index = () => {
               
               {mockBills.length === 0 && (
                 <div className="text-center py-8">
-                  <Receipt className="h-12 w-12 text-gray-600 mx-auto mb-3" />
-                  <p className="text-gray-400">No bills for this property</p>
+                  <Receipt className="h-8 w-8 text-gray-600 mx-auto mb-2" />
+                  <p className="text-gray-400 text-sm">No bills for this property</p>
                 </div>
               )}
             </div>
