@@ -49,13 +49,23 @@ const Index = () => {
     selectedApartmentId === "all" ? true : tenant.rooms.apartment_id === selectedApartmentId
   )
 
-  // Mock bills data for the selected apartment
-  const mockBills = selectedApartment ? [
-    { id: 1, name: "Water Company", type: "Water", amount: 85.50, dueDate: "2025-08-15", status: "pending" },
-    { id: 2, name: "Electricity Provider", type: "Electricity", amount: 156.80, dueDate: "2025-08-20", status: "paid" },
-    { id: 3, name: "Gas Natural", type: "Gas", amount: 89.50, dueDate: "2025-08-25", status: "pending" },
-    { id: 4, name: "Internet ISP", type: "Internet", amount: 45.00, dueDate: "2025-08-10", status: "paid" }
-  ] : []
+  // Mock bills data for all apartments
+  const allMockBills = apartments.reduce((bills, apartment) => {
+    const apartmentBills = [
+      { id: `${apartment.id}-1`, apartmentId: apartment.id, name: "Water Company", type: "Water", amount: 85.50, dueDate: "2025-08-15", status: Math.random() > 0.5 ? "paid" : "pending" },
+      { id: `${apartment.id}-2`, apartmentId: apartment.id, name: "Electricity Provider", type: "Electricity", amount: 156.80, dueDate: "2025-08-20", status: Math.random() > 0.5 ? "paid" : "pending" },
+      { id: `${apartment.id}-3`, apartmentId: apartment.id, name: "Gas Natural", type: "Gas", amount: 89.50, dueDate: "2025-08-25", status: Math.random() > 0.5 ? "paid" : "pending" },
+      { id: `${apartment.id}-4`, apartmentId: apartment.id, name: "Internet ISP", type: "Internet", amount: 45.00, dueDate: "2025-08-10", status: Math.random() > 0.5 ? "paid" : "pending" },
+      { id: `${apartment.id}-5`, apartmentId: apartment.id, name: "Property Insurance", type: "Insurance", amount: 120.00, dueDate: "2025-08-12", status: Math.random() > 0.5 ? "paid" : "pending" },
+      { id: `${apartment.id}-6`, apartmentId: apartment.id, name: "Building Maintenance", type: "Maintenance", amount: 75.00, dueDate: "2025-08-18", status: Math.random() > 0.5 ? "paid" : "pending" }
+    ]
+    return [...bills, ...apartmentBills]
+  }, [])
+
+  // Filter bills for selected apartment
+  const mockBills = selectedApartmentId === "all" 
+    ? allMockBills 
+    : allMockBills.filter(bill => bill.apartmentId === selectedApartmentId)
 
   // Calculate dashboard statistics
   const currentMonth = new Date().toISOString().slice(0, 7)
