@@ -14,12 +14,32 @@ import { useToast } from "@/hooks/use-toast"
 import { format } from "date-fns"
 
 const Index = () => {
+  const [selectedApartmentId, setSelectedApartmentId] = useState<string>("all")
+  const [selectedMonth, setSelectedMonth] = useState<string>(new Date().toISOString().slice(0, 7)) // YYYY-MM format
+  
   const { data: apartments = [] } = useApartments()
   const { data: tenants = [] } = useTenants()
   const { data: payments = [] } = useRentPayments()
   const updatePayment = useUpdateRentPayment()
   const { toast } = useToast()
-  const [selectedApartmentId, setSelectedApartmentId] = useState<string>("all")
+
+  // Generate month options (6 months back, current month, 6 months forward)
+  const generateMonthOptions = () => {
+    const options = []
+    const currentDate = new Date()
+    
+    for (let i = -6; i <= 6; i++) {
+      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1)
+      const monthKey = date.toISOString().slice(0, 7)
+      const monthLabel = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+      options.push({ value: monthKey, label: monthLabel })
+    }
+    
+    return options
+  }
+
+  const monthOptions = generateMonthOptions()
+  const selectedMonthLabel = monthOptions.find(option => option.value === selectedMonth)?.label || "Select Month"
 
   const handlePaymentToggle = async (tenantId: string, currentStatus: boolean) => {
     const payment = currentMonthPayments.find(p => p.tenant_id === tenantId)
@@ -56,11 +76,10 @@ const Index = () => {
     selectedApartmentId === "all" ? true : bill.apartment_id === selectedApartmentId
   )
 
-  // Calculate dashboard statistics
-  const currentMonth = new Date().toISOString().slice(0, 7)
+  // Calculate dashboard statistics for selected month
   const currentMonthPayments = payments.filter(p => {
     const paymentTenant = tenants.find(t => t.id === p.tenant_id)
-    return p.due_date.startsWith(currentMonth) && 
+    return p.due_date.startsWith(selectedMonth) && 
            (selectedApartmentId === "all" ? true : paymentTenant?.rooms.apartment_id === selectedApartmentId)
   })
   const paidPayments = currentMonthPayments.filter(p => p.is_paid)
@@ -85,16 +104,42 @@ const Index = () => {
   const totalBillsDue = filteredBills.filter(bill => !bill.is_paid).reduce((sum, bill) => sum + Number(bill.amount), 0)
   const totalBillsPaid = filteredBills.filter(bill => bill.is_paid).reduce((sum, bill) => sum + Number(bill.amount), 0)
 
-  const currentMonthName = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+  const currentMonthName = selectedMonthLabel
 
   return (
       <div className="min-h-screen bg-background text-foreground">
-      {/* Header with prominent month display */}
+      {/* Header with month selector */}
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-white">
-            August 2025
-          </h1>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button 
+                variant="ghost" 
+                className="text-3xl font-bold text-white p-0 h-auto hover:bg-transparent hover:text-primary transition-colors"
+              >
+                <Calendar className="h-8 w-8 mr-3" />
+                {currentMonthName}
+                <ChevronDown className="h-6 w-6 ml-2" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-64 p-0" align="start">
+              <div className="p-2">
+                <div className="text-sm font-medium text-muted-foreground mb-2 px-2">Select Month</div>
+                <div className="space-y-1">
+                  {monthOptions.map((option) => (
+                    <Button
+                      key={option.value}
+                      variant={selectedMonth === option.value ? "default" : "ghost"}
+                      className="w-full justify-start text-sm"
+                      onClick={() => setSelectedMonth(option.value)}
+                    >
+                      {option.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
 
         {/* Apartment Selector */}
