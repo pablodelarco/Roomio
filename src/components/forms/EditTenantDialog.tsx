@@ -299,31 +299,22 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
             </div>
           </div>
 
-          <div className="p-3 border rounded-lg bg-muted/20">
-            <h4 className="font-medium mb-2 text-sm">Current Month Payment Status</h4>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs">Rent Amount:</span>
-                <span className="font-medium text-sm">€{tenant.rooms.monthly_rent}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs">Payment Status:</span>
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs px-2 py-1 rounded ${isRentPaid ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
-                    {isRentPaid ? 'Paid' : 'Pending'}
-                  </span>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-6 px-2 text-xs"
-                    onClick={() => handleRentPaymentToggle(!isRentPaid)}
-                    disabled={updatePayment.isPending}
-                  >
-                    Mark as {isRentPaid ? 'Pending' : 'Paid'}
-                  </Button>
-                </div>
-              </div>
+          <div className="flex items-center justify-between py-2">
+            <Label htmlFor="rent_paid" className="text-xs">Current Month Rent Status</Label>
+            <div className="flex items-center gap-2">
+              <span className={`text-xs px-2 py-1 rounded ${isRentPaid ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
+                {isRentPaid ? 'Paid' : 'Pending'}
+              </span>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-6 px-2 text-xs"
+                onClick={() => handleRentPaymentToggle(!isRentPaid)}
+                disabled={updatePayment.isPending}
+              >
+                Mark as {isRentPaid ? 'Pending' : 'Paid'}
+              </Button>
             </div>
           </div>
 

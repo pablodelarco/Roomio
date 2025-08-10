@@ -142,6 +142,13 @@ const Index = () => {
                 const isPaid = tenantPayment?.is_paid || false
                 const amount = tenant.rooms.monthly_rent
                 
+                const handleLocalPaymentToggle = async (e: React.MouseEvent) => {
+                  e.stopPropagation()
+                  if (tenantPayment) {
+                    await handlePaymentToggle(tenant.id, isPaid)
+                  }
+                }
+                
                 return (
                   <EditTenantDialog key={tenant.id} tenant={tenant}>
                     <div className="bg-muted rounded-lg p-3 flex items-center justify-between cursor-pointer hover:bg-muted/70 transition-colors">
@@ -154,13 +161,23 @@ const Index = () => {
                           <div className="text-muted-foreground text-xs">Room {tenant.rooms.room_number} • €{amount}.00/month</div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="font-bold text-foreground text-sm">€{amount}.00</div>
-                        <div className={`text-xs px-2 py-1 rounded ${
-                          isPaid ? 'text-green-500' : 'text-red-500'
-                        }`}>
-                          {isPaid ? 'Paid' : 'Pending'}
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <div className="font-bold text-foreground text-sm">€{amount}.00</div>
+                          <div className={`text-xs px-2 py-1 rounded ${
+                            isPaid ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'
+                          }`}>
+                            {isPaid ? 'Paid' : 'Pending'}
+                          </div>
                         </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 px-2 text-xs"
+                          onClick={handleLocalPaymentToggle}
+                        >
+                          Mark as {isPaid ? 'Pending' : 'Paid'}
+                        </Button>
                       </div>
                     </div>
                   </EditTenantDialog>
