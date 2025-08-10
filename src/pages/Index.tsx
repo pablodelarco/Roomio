@@ -143,61 +143,27 @@ const Index = () => {
                 const amount = tenant.rooms.monthly_rent
                 
                 return (
-                  <Popover key={tenant.id}>
-                    <PopoverTrigger asChild>
-                      <div className="bg-muted rounded-lg p-3 flex items-center justify-between cursor-pointer hover:bg-muted/70 transition-colors">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs">
-                            {tenant.first_name[0]}{tenant.last_name[0]}
-                          </div>
-                          <div>
-                            <div className="font-medium text-foreground text-sm">{tenant.first_name} {tenant.last_name}</div>
-                            <div className="text-muted-foreground text-xs">Room {tenant.rooms.room_number} • €{amount}.00/month</div>
-                          </div>
+                  <EditTenantDialog key={tenant.id} tenant={tenant}>
+                    <div className="bg-muted rounded-lg p-3 flex items-center justify-between cursor-pointer hover:bg-muted/70 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs">
+                          {tenant.first_name[0]}{tenant.last_name[0]}
                         </div>
-                        <div className="text-right">
-                          <div className="font-bold text-foreground text-sm">€{amount}.00</div>
-                          <div className={`text-xs px-2 py-1 rounded ${
-                            isPaid ? 'text-green-500' : 'text-red-500'
-                          }`}>
-                            {isPaid ? 'Paid' : 'Pending'}
-                          </div>
+                        <div>
+                          <div className="font-medium text-foreground text-sm">{tenant.first_name} {tenant.last_name}</div>
+                          <div className="text-muted-foreground text-xs">Room {tenant.rooms.room_number} • €{amount}.00/month</div>
                         </div>
                       </div>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-48 p-2 bg-card border-border" align="end">
-                      <div className="space-y-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="w-full justify-start text-green-500 hover:bg-green-500/10"
-                          onClick={() => handlePaymentToggle(tenant.id, false)}
-                        >
-                          <Check className="h-4 w-4 mr-2" />
-                          Mark as Paid
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="w-full justify-start text-red-500 hover:bg-red-500/10"
-                          onClick={() => handlePaymentToggle(tenant.id, true)}
-                        >
-                          <X className="h-4 w-4 mr-2" />
-                          Mark as Pending
-                        </Button>
-                        <EditTenantDialog tenant={tenant}>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="w-full justify-start text-blue-500 hover:bg-blue-500/10"
-                          >
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit Tenant
-                          </Button>
-                        </EditTenantDialog>
+                      <div className="text-right">
+                        <div className="font-bold text-foreground text-sm">€{amount}.00</div>
+                        <div className={`text-xs px-2 py-1 rounded ${
+                          isPaid ? 'text-green-500' : 'text-red-500'
+                        }`}>
+                          {isPaid ? 'Paid' : 'Pending'}
+                        </div>
                       </div>
-                    </PopoverContent>
-                  </Popover>
+                    </div>
+                  </EditTenantDialog>
                 )
               })}
               

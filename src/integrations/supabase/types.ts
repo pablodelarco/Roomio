@@ -137,6 +137,7 @@ export type Database = {
           created_at: string
           deposit_amount: number | null
           deposit_paid: boolean | null
+          deposit_returned: boolean | null
           email: string | null
           first_name: string
           id: string
@@ -151,6 +152,7 @@ export type Database = {
           created_at?: string
           deposit_amount?: number | null
           deposit_paid?: boolean | null
+          deposit_returned?: boolean | null
           email?: string | null
           first_name: string
           id?: string
@@ -165,6 +167,7 @@ export type Database = {
           created_at?: string
           deposit_amount?: number | null
           deposit_paid?: boolean | null
+          deposit_returned?: boolean | null
           email?: string | null
           first_name?: string
           id?: string

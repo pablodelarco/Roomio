@@ -33,6 +33,7 @@ export type Tenant = {
   lease_end: string | null
   deposit_amount: number | null
   deposit_paid: boolean
+  deposit_returned: boolean
   created_at: string
   updated_at: string
 }
@@ -366,6 +367,7 @@ export function useUpdateTenant() {
       lease_end: string | null
       deposit_amount: number | null
       deposit_paid: boolean
+      deposit_returned: boolean
     }) => {
       const { data, error } = await supabase
         .from('tenants')
@@ -379,6 +381,7 @@ export function useUpdateTenant() {
           lease_end: tenant.lease_end,
           deposit_amount: tenant.deposit_amount,
           deposit_paid: tenant.deposit_paid,
+          deposit_returned: tenant.deposit_returned,
           updated_at: new Date().toISOString()
         })
         .eq('id', tenant.id)

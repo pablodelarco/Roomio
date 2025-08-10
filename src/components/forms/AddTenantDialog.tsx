@@ -55,7 +55,8 @@ export function AddTenantDialog() {
         lease_start: formData.lease_start.toISOString().split('T')[0],
         lease_end: formData.lease_end?.toISOString().split('T')[0] || null,
         deposit_amount: formData.deposit_amount ? parseFloat(formData.deposit_amount) : null,
-        deposit_paid: formData.deposit_paid
+        deposit_paid: formData.deposit_paid,
+        deposit_returned: false
       })
 
       toast({

@@ -8,7 +8,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { CalendarIcon, Edit } from "lucide-react"
 import { format } from "date-fns"
-import { useUpdateTenant, useApartments, useRooms, type Tenant } from "@/hooks/use-apartments"
+import { useUpdateTenant, useApartments, useRooms, useRentPayments, useUpdateRentPayment, type Tenant } from "@/hooks/use-apartments"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { Switch } from "@/components/ui/switch"
@@ -37,12 +37,15 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
     lease_start: null as Date | null,
     lease_end: null as Date | null,
     deposit_amount: "",
-    deposit_paid: false
+    deposit_paid: false,
+    deposit_returned: false
   })
 
   const { data: apartments = [] } = useApartments()
   const { data: rooms = [] } = useRooms()
+  const { data: payments = [] } = useRentPayments()
   const updateTenant = useUpdateTenant()
+  const updatePayment = useUpdateRentPayment()
   const { toast } = useToast()
 
   // Populate form data when tenant prop changes
@@ -57,12 +60,40 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
         lease_start: tenant.lease_start ? new Date(tenant.lease_start) : null,
         lease_end: tenant.lease_end ? new Date(tenant.lease_end) : null,
         deposit_amount: tenant.deposit_amount?.toString() || "",
-        deposit_paid: tenant.deposit_paid
+        deposit_paid: tenant.deposit_paid,
+        deposit_returned: (tenant as any).deposit_returned || false
       })
     }
   }, [tenant])
 
   const availableRooms = rooms.filter(room => !room.is_occupied || room.id === tenant.room_id)
+  
+  // Get current month payment for this tenant
+  const currentMonth = new Date().toISOString().slice(0, 7)
+  const currentPayment = payments.find(p => p.tenant_id === tenant.id && p.due_date.startsWith(currentMonth))
+  const isRentPaid = currentPayment?.is_paid || false
+
+  const handleRentPaymentToggle = async (isPaid: boolean) => {
+    if (currentPayment) {
+      try {
+        await updatePayment.mutateAsync({
+          id: currentPayment.id,
+          is_paid: isPaid,
+          paid_date: isPaid ? new Date().toISOString().split('T')[0] : undefined
+        })
+        toast({
+          title: "Success",
+          description: `Rent marked as ${isPaid ? 'paid' : 'pending'}`,
+        })
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to update payment status",
+          variant: "destructive",
+        })
+      }
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -87,8 +118,9 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
         lease_start: formData.lease_start.toISOString().split('T')[0],
         lease_end: formData.lease_end?.toISOString().split('T')[0] || null,
         deposit_amount: formData.deposit_amount ? parseFloat(formData.deposit_amount) : null,
-        deposit_paid: formData.deposit_paid
-      })
+        deposit_paid: formData.deposit_paid,
+        deposit_returned: formData.deposit_returned
+      } as any)
 
       toast({
         title: "Success",
@@ -252,20 +284,41 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
             />
           </div>
 
-          {showPaymentStatus && (
-            <div className="p-4 border rounded-lg bg-muted/20">
-              <h4 className="font-medium mb-2">Current Month Payment Status</h4>
-              <p className="text-sm text-muted-foreground mb-2">
-                Rent: €{tenant.rooms.monthly_rent}
-              </p>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="deposit_returned">Deposit Returned</Label>
+            <Switch
+              id="deposit_returned"
+              checked={formData.deposit_returned}
+              onCheckedChange={(checked) => setFormData({ ...formData, deposit_returned: checked })}
+            />
+          </div>
+
+          <div className="p-4 border rounded-lg bg-muted/20">
+            <h4 className="font-medium mb-3">Current Month Payment Status</h4>
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm">Payment Received</span>
-                <Button variant="outline" size="sm">
-                  Mark as Paid
-                </Button>
+                <span className="text-sm">Rent Amount:</span>
+                <span className="font-medium">€{tenant.rooms.monthly_rent}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Payment Status:</span>
+                <div className="flex items-center gap-2">
+                  <span className={`text-sm px-2 py-1 rounded ${isRentPaid ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
+                    {isRentPaid ? 'Paid' : 'Pending'}
+                  </span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleRentPaymentToggle(!isRentPaid)}
+                    disabled={updatePayment.isPending}
+                  >
+                    Mark as {isRentPaid ? 'Pending' : 'Paid'}
+                  </Button>
+                </div>
               </div>
             </div>
-          )}
+          </div>
 
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
