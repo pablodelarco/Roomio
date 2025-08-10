@@ -2,95 +2,138 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+/* Modern Rental Management Design System
 All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Base colors - clean blue-gray palette */
+    --background: 220 13% 98%;
+    --foreground: 220 26% 14%;
 
+    /* Card system with subtle depth */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 220 26% 14%;
 
+    /* Popover and overlay elements */
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 220 26% 14%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary brand - professional blue */
+    --primary: 213 94% 68%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 213 94% 62%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary - subtle gray-blue */
+    --secondary: 220 13% 96%;
+    --secondary-foreground: 220 26% 14%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted elements */
+    --muted: 220 13% 95%;
+    --muted-foreground: 220 9% 46%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent colors for highlights */
+    --accent: 213 94% 68%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Status colors */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Interactive elements */
+    --border: 220 13% 91%;
+    --input: 220 13% 96%;
+    --ring: 213 94% 68%;
 
-    --radius: 0.5rem;
+    /* Layout radius */
+    --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
+    /* Sidebar specific colors */
+    --sidebar-background: 220 26% 14%;
+    --sidebar-foreground: 220 13% 91%;
+    --sidebar-primary: 213 94% 68%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 20% 20%;
+    --sidebar-accent-foreground: 220 13% 91%;
+    --sidebar-border: 220 20% 18%;
+    --sidebar-ring: 213 94% 68%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    /* Glass effect variables */
+    --glass-bg: 0 0% 100% / 0.8;
+    --glass-border: 220 13% 91% / 0.5;
 
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(213 94% 68%), hsl(213 94% 78%));
+    --gradient-success: linear-gradient(135deg, hsl(142 71% 45%), hsl(142 71% 55%));
+    --gradient-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(220 13% 98%));
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Dark mode - professional dark blue-gray */
+    --background: 220 26% 8%;
+    --foreground: 220 13% 91%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    /* Cards with subtle elevation */
+    --card: 220 26% 11%;
+    --card-foreground: 220 13% 91%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    /* Popover and overlay elements */
+    --popover: 220 26% 11%;
+    --popover-foreground: 220 13% 91%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* Primary brand - bright blue for dark mode */
+    --primary: 213 94% 68%;
+    --primary-foreground: 220 26% 8%;
+    --primary-hover: 213 94% 75%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    /* Secondary elements */
+    --secondary: 220 26% 14%;
+    --secondary-foreground: 220 13% 91%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    /* Muted elements */
+    --muted: 220 26% 14%;
+    --muted-foreground: 220 9% 60%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    /* Accent colors */
+    --accent: 213 94% 68%;
+    --accent-foreground: 220 26% 8%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    /* Status colors for dark mode */
+    --success: 142 71% 55%;
+    --success-foreground: 220 26% 8%;
+    --warning: 38 92% 60%;
+    --warning-foreground: 220 26% 8%;
+    --destructive: 0 84% 65%;
+    --destructive-foreground: 220 26% 8%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Interactive elements */
+    --border: 220 20% 18%;
+    --input: 220 26% 14%;
+    --ring: 213 94% 68%;
+
+    /* Sidebar colors for dark mode */
+    --sidebar-background: 220 26% 6%;
+    --sidebar-foreground: 220 13% 85%;
+    --sidebar-primary: 213 94% 68%;
+    --sidebar-primary-foreground: 220 26% 8%;
+    --sidebar-accent: 220 26% 12%;
+    --sidebar-accent-foreground: 220 13% 85%;
+    --sidebar-border: 220 20% 15%;
+    --sidebar-ring: 213 94% 68%;
+
+    /* Glass effect for dark mode */
+    --glass-bg: 220 26% 11% / 0.8;
+    --glass-border: 220 20% 18% / 0.5;
+
+    /* Dark mode gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(213 94% 68%), hsl(213 94% 58%));
+    --gradient-success: linear-gradient(135deg, hsl(142 71% 55%), hsl(142 71% 45%));
+    --gradient-card: linear-gradient(135deg, hsl(220 26% 11%), hsl(220 26% 8%));
   }
 }
 
