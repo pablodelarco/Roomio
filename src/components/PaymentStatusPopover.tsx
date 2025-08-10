@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { useUpdateRentPayment } from "@/hooks/use-apartments"
+import { useUpdateRentPayment, useRentPayments } from "@/hooks/use-apartments"
 import { useToast } from "@/hooks/use-toast"
 
 interface PaymentStatusPopoverProps {
@@ -28,6 +28,7 @@ export function PaymentStatusPopover({
 }: PaymentStatusPopoverProps) {
   const [open, setOpen] = useState(false)
   const updatePayment = useUpdateRentPayment()
+  const { refetch: refetchPayments } = useRentPayments()
   const { toast } = useToast()
 
   const handleRentToggle = async (checked: boolean) => {
@@ -37,15 +38,18 @@ export function PaymentStatusPopover({
         const { supabase } = await import("@/integrations/supabase/client")
         const dueDate = `${selectedMonth}-01`
         
-        await supabase
+        const { error } = await supabase
           .from('rent_payments')
           .insert({
             tenant_id: tenantId,
             amount: monthlyRent,
             due_date: dueDate,
             is_paid: checked,
-            paid_date: checked ? new Date().toISOString().split('T')[0] : null
+            paid_date: checked ? new Date().toISOString().split('T')[0] : null,
+            utilities_paid: false
           })
+          
+        if (error) throw error
       } else {
         // Update existing payment record
         await updatePayment.mutateAsync({
@@ -55,12 +59,16 @@ export function PaymentStatusPopover({
         })
       }
       
+      // Force refresh the payments data
+      await refetchPayments()
+      
       toast({
         description: `${tenantName} rent ${checked ? 'paid' : 'pending'}`,
         duration: 2000,
       })
       setOpen(false)
     } catch (error) {
+      console.error('Error updating rent payment:', error)
       toast({
         description: "Failed to update rent status",
         variant: "destructive",
@@ -76,15 +84,18 @@ export function PaymentStatusPopover({
         const { supabase } = await import("@/integrations/supabase/client")
         const dueDate = `${selectedMonth}-01`
         
-        await supabase
+        const { error } = await supabase
           .from('rent_payments')
           .insert({
             tenant_id: tenantId,
             amount: monthlyRent,
             due_date: dueDate,
             is_paid: false,
-            utilities_paid: checked
+            utilities_paid: checked,
+            paid_date: null
           })
+          
+        if (error) throw error
       } else {
         // Update existing payment record
         await updatePayment.mutateAsync({
@@ -93,12 +104,16 @@ export function PaymentStatusPopover({
         })
       }
       
+      // Force refresh the payments data
+      await refetchPayments()
+      
       toast({
         description: `${tenantName} utilities ${checked ? 'paid' : 'pending'}`,
         duration: 2000,
       })
       setOpen(false)
     } catch (error) {
+      console.error('Error updating utilities payment:', error)
       toast({
         description: "Failed to update utilities status",
         variant: "destructive",
