@@ -488,6 +488,7 @@ export const useCreateBill = () => {
       utilities_paid: boolean
       ready_to_pay: boolean
     }) => {
+      console.log('Inserting bill into Supabase:', billData)
       const { data, error } = await supabase
         .from('bills')
         .insert({
@@ -503,10 +504,15 @@ export const useCreateBill = () => {
         .select()
         .single()
       
-      if (error) throw error
+      if (error) {
+        console.error('Supabase error:', error)
+        throw error
+      }
+      console.log('Bill inserted successfully:', data)
       return data
     },
     onSuccess: () => {
+      console.log('Invalidating bills query after successful creation')
       queryClient.invalidateQueries({ queryKey: ['bills'] })
     },
   })
