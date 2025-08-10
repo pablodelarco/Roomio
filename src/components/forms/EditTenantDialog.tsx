@@ -75,6 +75,7 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
 
   const handleRentPaymentToggle = async (isPaid: boolean) => {
     if (currentPayment) {
+      // Update existing payment record
       try {
         await updatePayment.mutateAsync({
           id: currentPayment.id,
@@ -94,11 +95,48 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
         })
       }
     } else {
-      toast({
-        title: "Error", 
-        description: "No payment record found for current month",
-        variant: "destructive",
-      })
+      // Create new payment record for current month
+      try {
+        const currentDate = new Date()
+        const currentMonth = currentDate.toISOString().slice(0, 7) // YYYY-MM format
+        const dueDate = `${currentMonth}-01` // First day of current month
+        
+        const response = await fetch(`https://tddfubdbrmcteclrpnfv.supabase.co/rest/v1/rent_payments`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkZGZ1YmRicm1jdGVjbHJwbmZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4NDUzODAsImV4cCI6MjA3MDQyMTM4MH0.kHYNw-2PIi-Cg5eOxPYExb1CcnfcFoqOCGiMizCZJPY',
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkZGZ1YmRicm1jdGVjbHJwbmZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4NDUzODAsImV4cCI6MjA3MDQyMTM4MH0.kHYNw-2PIi-Cg5eOxPYExb1CcnfcFoqOCGiMizCZJPY',
+            'Prefer': 'return=representation'
+          },
+          body: JSON.stringify({
+            tenant_id: tenant.id,
+            amount: tenant.rooms.monthly_rent,
+            due_date: dueDate,
+            is_paid: isPaid,
+            paid_date: isPaid ? new Date().toISOString().split('T')[0] : null
+          })
+        })
+
+        if (response.ok) {
+          toast({
+            title: "Success",
+            description: `Rent record created and marked as ${isPaid ? 'paid' : 'pending'}`,
+          })
+          // Refresh the data by closing and reopening the dialog
+          setOpen(false)
+          setTimeout(() => setOpen(true), 100)
+        } else {
+          throw new Error('Failed to create payment record')
+        }
+      } catch (error) {
+        console.error('Error creating payment record:', error)
+        toast({
+          title: "Error", 
+          description: "Failed to create payment record",
+          variant: "destructive",
+        })
+      }
     }
   }
 
