@@ -62,15 +62,16 @@ export function PaymentStatusPopover({
         const { supabase } = await import("@/integrations/supabase/client")
         const dueDate = `${selectedMonth}-01`
         
-        // First check if a payment record already exists for this tenant and month
-        const { data: existingPayment } = await supabase
+        // Get the first existing payment record (there might be duplicates)
+        const { data: existingPayments } = await supabase
           .from('rent_payments')
           .select('id')
           .eq('tenant_id', tenantId)
           .eq('due_date', dueDate)
-          .maybeSingle()
+          .limit(1)
         
-        if (existingPayment) {
+        if (existingPayments && existingPayments.length > 0) {
+          const existingPayment = existingPayments[0]
           // Update existing record
           console.log('Updating existing payment record (rent):', {
             id: existingPayment.id,
@@ -172,15 +173,16 @@ export function PaymentStatusPopover({
         const { supabase } = await import("@/integrations/supabase/client")
         const dueDate = `${selectedMonth}-01`
         
-        // First check if a payment record already exists for this tenant and month
-        const { data: existingPayment } = await supabase
+        // Get the first existing payment record (there might be duplicates)
+        const { data: existingPayments } = await supabase
           .from('rent_payments')
           .select('id')
           .eq('tenant_id', tenantId)
           .eq('due_date', dueDate)
-          .maybeSingle()
+          .limit(1)
         
-        if (existingPayment) {
+        if (existingPayments && existingPayments.length > 0) {
+          const existingPayment = existingPayments[0]
           // Update existing record
           console.log('Updating existing payment record (utilities):', {
             id: existingPayment.id,
