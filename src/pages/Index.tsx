@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { useApartments, useTenants, useRentPayments, useUpdateRentPayment } from "@/hooks/use-apartments"
+import { useApartments, useTenants, useRentPayments, useUpdateRentPayment, useBills } from "@/hooks/use-apartments"
 import { EditTenantDialog } from "@/components/forms/EditTenantDialog"
 import { PaymentStatusPopover } from "@/components/PaymentStatusPopover"
 import { useToast } from "@/hooks/use-toast"
@@ -49,23 +49,11 @@ const Index = () => {
     selectedApartmentId === "all" ? true : tenant.rooms.apartment_id === selectedApartmentId
   )
 
-  // Mock bills data for all apartments
-  const allMockBills = apartments.reduce((bills, apartment) => {
-    const apartmentBills = [
-      { id: `${apartment.id}-1`, apartmentId: apartment.id, name: "Water Company", type: "Water", amount: 85.50, dueDate: "2025-08-15", status: Math.random() > 0.5 ? "paid" : "pending" },
-      { id: `${apartment.id}-2`, apartmentId: apartment.id, name: "Electricity Provider", type: "Electricity", amount: 156.80, dueDate: "2025-08-20", status: Math.random() > 0.5 ? "paid" : "pending" },
-      { id: `${apartment.id}-3`, apartmentId: apartment.id, name: "Gas Natural", type: "Gas", amount: 89.50, dueDate: "2025-08-25", status: Math.random() > 0.5 ? "paid" : "pending" },
-      { id: `${apartment.id}-4`, apartmentId: apartment.id, name: "Internet ISP", type: "Internet", amount: 45.00, dueDate: "2025-08-10", status: Math.random() > 0.5 ? "paid" : "pending" },
-      { id: `${apartment.id}-5`, apartmentId: apartment.id, name: "Property Insurance", type: "Insurance", amount: 120.00, dueDate: "2025-08-12", status: Math.random() > 0.5 ? "paid" : "pending" },
-      { id: `${apartment.id}-6`, apartmentId: apartment.id, name: "Building Maintenance", type: "Maintenance", amount: 75.00, dueDate: "2025-08-18", status: Math.random() > 0.5 ? "paid" : "pending" }
-    ]
-    return [...bills, ...apartmentBills]
-  }, [])
-
   // Filter bills for selected apartment
-  const mockBills = selectedApartmentId === "all" 
-    ? allMockBills 
-    : allMockBills.filter(bill => bill.apartmentId === selectedApartmentId)
+  const { data: bills = [] } = useBills()
+  const filteredBills = bills.filter(bill => 
+    selectedApartmentId === "all" ? true : bill.apartment_id === selectedApartmentId
+  )
 
   // Calculate dashboard statistics
   const currentMonth = new Date().toISOString().slice(0, 7)
@@ -81,8 +69,8 @@ const Index = () => {
   const totalReceived = paidPayments.reduce((sum, p) => sum + p.amount, 0)
   
   // Calculate bills due and paid from actual bills data
-  const totalBillsDue = mockBills.filter(bill => bill.status !== 'paid').reduce((sum, bill) => sum + bill.amount, 0)
-  const totalBillsPaid = mockBills.filter(bill => bill.status === 'paid').reduce((sum, bill) => sum + bill.amount, 0)
+  const totalBillsDue = filteredBills.filter(bill => !bill.is_paid).reduce((sum, bill) => sum + Number(bill.amount), 0)
+  const totalBillsPaid = filteredBills.filter(bill => bill.is_paid).reduce((sum, bill) => sum + Number(bill.amount), 0)
 
   const currentMonthName = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 
@@ -219,23 +207,23 @@ const Index = () => {
             </div>
             
             <div className="space-y-2">
-              {mockBills.map((bill) => {
-                const isPaid = bill.status === 'paid'
-                const isOverdue = new Date(bill.dueDate) < new Date() && !isPaid
+              {filteredBills.map((bill) => {
+                const isPaid = bill.is_paid
+                const isOverdue = new Date(bill.due_date) < new Date() && !isPaid
                 
                 return (
                   <div key={bill.id} className="bg-muted rounded-lg p-3 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-muted-foreground/20 flex items-center justify-center text-foreground font-bold text-xs">
-                        {bill.name.charAt(0).toUpperCase()}
+                        {bill.provider.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <div className="font-medium text-foreground text-sm">{bill.name}</div>
-                        <div className="text-muted-foreground text-xs">{bill.type} • Due {format(new Date(bill.dueDate), "M/d/yyyy")}</div>
+                        <div className="font-medium text-foreground text-sm">{bill.provider}</div>
+                        <div className="text-muted-foreground text-xs">{bill.bill_type} • Due {format(new Date(bill.due_date), "M/d/yyyy")}</div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-bold text-foreground text-sm">€{bill.amount}</div>
+                      <div className="font-bold text-foreground text-sm">€{Number(bill.amount).toLocaleString()}</div>
                       <div className={`text-xs px-2 py-1 rounded ${
                         isPaid ? 'text-green-500' : isOverdue ? 'text-red-500' : 'text-orange-500'
                       }`}>
@@ -246,7 +234,7 @@ const Index = () => {
                 )
               })}
               
-              {mockBills.length === 0 && (
+              {filteredBills.length === 0 && (
                 <div className="text-center py-8">
                   <Receipt className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                   <p className="text-muted-foreground text-sm">No bills for this property</p>

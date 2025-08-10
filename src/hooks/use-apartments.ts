@@ -473,3 +473,41 @@ export function useUpdateBill() {
     },
   })
 }
+
+export const useCreateBill = () => {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: async (billData: {
+      provider: string
+      bill_type: string
+      amount: number
+      due_date: string
+      apartment_id: string
+      is_paid: boolean
+      utilities_paid: boolean
+      ready_to_pay: boolean
+    }) => {
+      const { data, error } = await supabase
+        .from('bills')
+        .insert({
+          provider: billData.provider,
+          bill_type: billData.bill_type,
+          amount: billData.amount,
+          due_date: billData.due_date,
+          apartment_id: billData.apartment_id,
+          is_paid: billData.is_paid,
+          utilities_paid: billData.utilities_paid,
+          ready_to_pay: billData.ready_to_pay,
+        })
+        .select()
+        .single()
+      
+      if (error) throw error
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bills'] })
+    },
+  })
+}

@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { useApartments, useBills } from "@/hooks/use-apartments"
 import { EditBillDialog } from "@/components/forms/EditBillDialog"
+import { AddBillDialog } from "@/components/forms/AddBillDialog"
 import { format } from "date-fns"
 
 const Bills = () => {
@@ -36,10 +37,12 @@ const Bills = () => {
           <h1 className="text-3xl font-bold text-foreground">Bills Management</h1>
           <p className="text-muted-foreground">Manage utility bills and payments for your properties</p>
         </div>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" />
-          Add Bill
-        </Button>
+        <AddBillDialog>
+          <Button className="gap-2">
+            <Plus className="h-4 w-4" />
+            Add Bill
+          </Button>
+        </AddBillDialog>
       </div>
 
       {/* Apartment Selector */}
@@ -122,10 +125,12 @@ const Bills = () => {
                 ? "No bills have been added yet." 
                 : "No bills found for the selected apartment."}
             </p>
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              Add First Bill
-            </Button>
+            <AddBillDialog>
+              <Button className="gap-2">
+                <Plus className="h-4 w-4" />
+                Add First Bill
+              </Button>
+            </AddBillDialog>
           </CardContent>
         </Card>
       )}
