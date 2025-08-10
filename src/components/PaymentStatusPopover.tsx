@@ -9,18 +9,42 @@ import { useToast } from "@/hooks/use-toast"
 
 interface PaymentStatusPopoverProps {
   paymentId: string
+  isRentPaid: boolean
   isUtilitiesPaid: boolean
   tenantName: string
 }
 
 export function PaymentStatusPopover({ 
   paymentId, 
+  isRentPaid,
   isUtilitiesPaid, 
   tenantName 
 }: PaymentStatusPopoverProps) {
   const [open, setOpen] = useState(false)
   const updatePayment = useUpdateRentPayment()
   const { toast } = useToast()
+
+  const handleRentToggle = async (checked: boolean) => {
+    try {
+      await updatePayment.mutateAsync({
+        id: paymentId,
+        is_paid: checked,
+        paid_date: checked ? new Date().toISOString().split('T')[0] : null
+      })
+      
+      toast({
+        description: `${tenantName} rent ${checked ? 'paid' : 'pending'}`,
+        duration: 2000,
+      })
+      setOpen(false)
+    } catch (error) {
+      toast({
+        description: "Failed to update rent status",
+        variant: "destructive",
+        duration: 3000,
+      })
+    }
+  }
 
   const handleUtilitiesToggle = async (checked: boolean) => {
     try {
@@ -29,12 +53,11 @@ export function PaymentStatusPopover({
         utilities_paid: checked
       })
       
-      // Less intrusive toast - shorter duration and simpler message
       toast({
         description: `${tenantName} utilities ${checked ? 'paid' : 'pending'}`,
-        duration: 2000, // Shorter duration
+        duration: 2000,
       })
-      setOpen(false) // Close popup after action
+      setOpen(false)
     } catch (error) {
       toast({
         description: "Failed to update utilities status",
@@ -52,8 +75,18 @@ export function PaymentStatusPopover({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-48 p-3 z-50 bg-background border shadow-lg" side="right" align="start">
-        <div className="space-y-3">
+        <div className="space-y-4">
           <h4 className="font-medium text-sm">{tenantName}</h4>
+
+          <div className="flex items-center justify-between">
+            <Label htmlFor="rent-status" className="text-sm">Rent paid</Label>
+            <Switch
+              id="rent-status"
+              checked={isRentPaid}
+              onCheckedChange={handleRentToggle}
+              disabled={updatePayment.isPending}
+            />
+          </div>
 
           <div className="flex items-center justify-between">
             <Label htmlFor="utilities-status" className="text-sm">Utilities paid</Label>

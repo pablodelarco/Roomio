@@ -182,6 +182,7 @@ const Index = () => {
                       {tenantPayment && (
                         <PaymentStatusPopover
                           paymentId={tenantPayment.id}
+                          isRentPaid={isRentPaid}
                           isUtilitiesPaid={isUtilitiesPaid}
                           tenantName={`${tenant.first_name} ${tenant.last_name}`}
                         />
