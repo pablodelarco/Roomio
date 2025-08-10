@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -79,19 +79,26 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
         await updatePayment.mutateAsync({
           id: currentPayment.id,
           is_paid: isPaid,
-          paid_date: isPaid ? new Date().toISOString().split('T')[0] : undefined
+          paid_date: isPaid ? new Date().toISOString().split('T')[0] : null
         })
         toast({
           title: "Success",
           description: `Rent marked as ${isPaid ? 'paid' : 'pending'}`,
         })
       } catch (error) {
+        console.error('Error updating payment:', error)
         toast({
           title: "Error",
           description: "Failed to update payment status",
           variant: "destructive",
         })
       }
+    } else {
+      toast({
+        title: "Error", 
+        description: "No payment record found for current month",
+        variant: "destructive",
+      })
     }
   }
 
@@ -149,6 +156,9 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Tenant</DialogTitle>
+          <DialogDescription>
+            Update tenant information and current month rent payment status.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
