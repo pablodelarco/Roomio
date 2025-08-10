@@ -96,7 +96,15 @@ export type Database = {
           updated_at?: string
           utilities_paid?: boolean | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "bills_apartment_id_fkey"
+            columns: ["apartment_id"]
+            isOneToOne: false
+            referencedRelation: "apartments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       rent_payments: {
         Row: {

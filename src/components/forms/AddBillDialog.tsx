@@ -53,7 +53,6 @@ export function AddBillDialog({ children }: AddBillDialogProps) {
   ]
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log('Creating bill with values:', values)
     try {
       await createBill.mutateAsync({
         provider: values.provider,
@@ -66,7 +65,6 @@ export function AddBillDialog({ children }: AddBillDialogProps) {
         ready_to_pay: false,
       })
 
-      console.log('Bill created successfully')
       toast({
         title: "Success",
         description: "Bill added successfully",
@@ -75,7 +73,6 @@ export function AddBillDialog({ children }: AddBillDialogProps) {
       form.reset()
       setOpen(false)
     } catch (error) {
-      console.error('Error creating bill:', error)
       toast({
         title: "Error",
         description: "Failed to add bill",
