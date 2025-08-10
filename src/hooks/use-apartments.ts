@@ -422,7 +422,7 @@ export function useUpdateTenant() {
 }
 
 // Bills hooks
-export function useBills() {
+export const useBills = () => {
   return useQuery({
     queryKey: ['bills'],
     queryFn: async () => {
