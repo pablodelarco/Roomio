@@ -80,8 +80,9 @@ const Index = () => {
   const totalRentDue = pendingPayments.reduce((sum, p) => sum + p.amount, 0)
   const totalReceived = paidPayments.reduce((sum, p) => sum + p.amount, 0)
   
-  // Calculate bills due from actual bills data
+  // Calculate bills due and paid from actual bills data
   const totalBillsDue = mockBills.filter(bill => bill.status !== 'paid').reduce((sum, bill) => sum + bill.amount, 0)
+  const totalBillsPaid = mockBills.filter(bill => bill.status === 'paid').reduce((sum, bill) => sum + bill.amount, 0)
 
   const currentMonthName = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 
@@ -132,9 +133,15 @@ const Index = () => {
           {/* Utilities Section */}
           <div className="bg-card rounded-xl p-4">
             <h3 className="text-sm font-medium text-muted-foreground mb-3">Utilities</h3>
-            <div className="text-center">
-              <div className="text-xl font-bold text-orange-500">€{totalBillsDue.toLocaleString()}</div>
-              <div className="text-muted-foreground text-xs">Bills Due</div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center">
+                <div className="text-xl font-bold text-orange-500">€{totalBillsDue.toLocaleString()}</div>
+                <div className="text-muted-foreground text-xs">Due</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xl font-bold text-green-500">€{totalBillsPaid.toLocaleString()}</div>
+                <div className="text-muted-foreground text-xs">Paid</div>
+              </div>
             </div>
           </div>
         </div>
