@@ -49,10 +49,15 @@ const Index = () => {
     selectedApartmentId === "all" ? true : tenant.rooms.apartment_id === selectedApartmentId
   )
 
+  // Mock bills data for the selected apartment
+  const mockBills = selectedApartment ? [
+    { id: 1, name: "Water Company", type: "Water", amount: 85.50, dueDate: "2025-08-15", status: "pending" },
+    { id: 2, name: "Electricity Provider", type: "Electricity", amount: 156.80, dueDate: "2025-08-20", status: "paid" },
+    { id: 3, name: "Gas Natural", type: "Gas", amount: 89.50, dueDate: "2025-08-25", status: "pending" },
+    { id: 4, name: "Internet ISP", type: "Internet", amount: 45.00, dueDate: "2025-08-10", status: "paid" }
+  ] : []
+
   // Calculate dashboard statistics
-  const totalRooms = selectedApartment ? selectedApartment.total_rooms : apartments.reduce((sum, apt) => sum + apt.total_rooms, 0)
-  const occupancyRate = totalRooms > 0 ? Math.round((apartmentTenants.length / totalRooms) * 100) : 0
-  
   const currentMonth = new Date().toISOString().slice(0, 7)
   const currentMonthPayments = payments.filter(p => {
     const paymentTenant = tenants.find(t => t.id === p.tenant_id)
@@ -64,18 +69,11 @@ const Index = () => {
   
   const totalRentDue = pendingPayments.reduce((sum, p) => sum + p.amount, 0)
   const totalReceived = paidPayments.reduce((sum, p) => sum + p.amount, 0)
-  const totalBillsDue = selectedApartment ? selectedApartment.monthly_bills : apartments.reduce((sum, apt) => sum + apt.monthly_bills, 0)
-  const overdueCount = pendingPayments.filter(p => new Date(p.due_date) < new Date()).length
+  
+  // Calculate bills due from actual bills data
+  const totalBillsDue = mockBills.filter(bill => bill.status !== 'paid').reduce((sum, bill) => sum + bill.amount, 0)
 
   const currentMonthName = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-
-  // Mock bills data for the selected apartment
-  const mockBills = selectedApartment ? [
-    { id: 1, name: "Water Company", type: "Water", amount: 85.50, dueDate: "2025-08-15", status: "pending" },
-    { id: 2, name: "Electricity Provider", type: "Electricity", amount: 156.80, dueDate: "2025-08-20", status: "paid" },
-    { id: 3, name: "Gas Natural", type: "Gas", amount: 89.50, dueDate: "2025-08-25", status: "pending" },
-    { id: 4, name: "Internet ISP", type: "Internet", amount: 45.00, dueDate: "2025-08-10", status: "paid" }
-  ] : []
 
   return (
       <div className="min-h-screen bg-background text-foreground">
@@ -109,7 +107,7 @@ const Index = () => {
           {/* Rent Section */}
           <div className="bg-card rounded-xl p-4">
             <h3 className="text-sm font-medium text-muted-foreground mb-3">Rent</h3>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
                 <div className="text-xl font-bold text-white">€{totalRentDue.toLocaleString()}</div>
                 <div className="text-muted-foreground text-xs">Due</div>
@@ -118,25 +116,15 @@ const Index = () => {
                 <div className="text-xl font-bold text-green-500">€{totalReceived.toLocaleString()}</div>
                 <div className="text-muted-foreground text-xs">Received</div>
               </div>
-              <div className="text-center">
-                <div className="text-xl font-bold text-red-500">{overdueCount}</div>
-                <div className="text-muted-foreground text-xs">Overdue</div>
-              </div>
             </div>
           </div>
 
           {/* Utilities Section */}
           <div className="bg-card rounded-xl p-4">
             <h3 className="text-sm font-medium text-muted-foreground mb-3">Utilities</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <div className="text-xl font-bold text-orange-500">€{totalBillsDue.toLocaleString()}</div>
-                <div className="text-muted-foreground text-xs">Bills Due</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xl font-bold text-blue-500">{occupancyRate}%</div>
-                <div className="text-muted-foreground text-xs">Occupancy</div>
-              </div>
+            <div className="text-center">
+              <div className="text-xl font-bold text-orange-500">€{totalBillsDue.toLocaleString()}</div>
+              <div className="text-muted-foreground text-xs">Bills Due</div>
             </div>
           </div>
         </div>
