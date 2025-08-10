@@ -58,9 +58,18 @@ export function PaymentStatusPopover({
     
     try {
       if (paymentId.includes('-')) {
-        // Create new payment record
+        // Create new payment record with BOTH current states
         const { supabase } = await import("@/integrations/supabase/client")
         const dueDate = `${selectedMonth}-01`
+        
+        console.log('Creating new payment record:', {
+          tenant_id: tenantId,
+          amount: monthlyRent,
+          due_date: dueDate,
+          is_paid: checked,
+          utilities_paid: localUtilitiesPaid, // Keep current utilities state
+          paid_date: checked ? new Date().toISOString().split('T')[0] : null
+        })
         
         const { error } = await supabase
           .from('rent_payments')
@@ -70,12 +79,21 @@ export function PaymentStatusPopover({
             due_date: dueDate,
             is_paid: checked,
             paid_date: checked ? new Date().toISOString().split('T')[0] : null,
-            utilities_paid: localUtilitiesPaid
+            utilities_paid: localUtilitiesPaid // Preserve utilities state
           })
           
-        if (error) throw error
+        if (error) {
+          console.error('Supabase insert error:', error)
+          throw error
+        }
       } else {
         // Update existing payment record
+        console.log('Updating existing payment record:', {
+          id: paymentId,
+          is_paid: checked,
+          paid_date: checked ? new Date().toISOString().split('T')[0] : null
+        })
+        
         await updatePayment.mutateAsync({
           id: paymentId,
           is_paid: checked,
@@ -125,9 +143,18 @@ export function PaymentStatusPopover({
     
     try {
       if (paymentId.includes('-')) {
-        // Create new payment record
+        // Create new payment record with BOTH current states
         const { supabase } = await import("@/integrations/supabase/client")
         const dueDate = `${selectedMonth}-01`
+        
+        console.log('Creating new payment record (utilities):', {
+          tenant_id: tenantId,
+          amount: monthlyRent,
+          due_date: dueDate,
+          is_paid: localRentPaid, // Keep current rent state
+          utilities_paid: checked,
+          paid_date: localRentPaid ? new Date().toISOString().split('T')[0] : null
+        })
         
         const { error } = await supabase
           .from('rent_payments')
@@ -135,14 +162,22 @@ export function PaymentStatusPopover({
             tenant_id: tenantId,
             amount: monthlyRent,
             due_date: dueDate,
-            is_paid: localRentPaid,
+            is_paid: localRentPaid, // Preserve rent state
             utilities_paid: checked,
             paid_date: localRentPaid ? new Date().toISOString().split('T')[0] : null
           })
           
-        if (error) throw error
+        if (error) {
+          console.error('Supabase insert error:', error)
+          throw error
+        }
       } else {
         // Update existing payment record
+        console.log('Updating existing payment record (utilities):', {
+          id: paymentId,
+          utilities_paid: checked
+        })
+        
         await updatePayment.mutateAsync({
           id: paymentId,
           utilities_paid: checked
