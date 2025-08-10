@@ -47,12 +47,7 @@ export function PaymentStatusPopover({
   const handleRentToggle = async (checked: boolean) => {
     if (isUpdating) return // Prevent multiple simultaneous updates
     
-    // Immediately update optimistic state across the app
-    if (tenantId && onOptimisticUpdate) {
-      onOptimisticUpdate(tenantId, { isRentPaid: checked })
-    }
-    
-    // Also update local state for the switch
+    // Update local state immediately but don't trigger parent optimistic updates yet
     setLocalRentPaid(checked)
     setIsUpdating(true)
     
@@ -127,8 +122,13 @@ export function PaymentStatusPopover({
         })
       }
       
-      // Trigger data refresh
-      await refetchPayments()
+      // Only trigger parent optimistic update AFTER successful database operation
+      if (tenantId && onOptimisticUpdate) {
+        onOptimisticUpdate(tenantId, { isRentPaid: checked })
+      }
+      
+      // Trigger data refresh but don't await it to avoid interfering with UI
+      refetchPayments()
       onUpdate?.() // Notify parent component
       
       toast({
@@ -136,10 +136,7 @@ export function PaymentStatusPopover({
         duration: 2000,
       })
     } catch (error) {
-      // Revert optimistic state on error
-      if (tenantId && onOptimisticUpdate) {
-        onOptimisticUpdate(tenantId, { isRentPaid: !checked })
-      }
+      // Revert local state on error
       setLocalRentPaid(!checked)
       console.error('Error updating rent payment:', error)
       toast({
@@ -155,12 +152,7 @@ export function PaymentStatusPopover({
   const handleUtilitiesToggle = async (checked: boolean) => {
     if (isUpdating) return // Prevent multiple simultaneous updates
     
-    // Immediately update optimistic state across the app
-    if (tenantId && onOptimisticUpdate) {
-      onOptimisticUpdate(tenantId, { isUtilitiesPaid: checked })
-    }
-    
-    // Also update local state for the switch
+    // Update local state immediately but don't trigger parent optimistic updates yet
     setLocalUtilitiesPaid(checked)
     setIsUpdating(true)
     
@@ -231,8 +223,13 @@ export function PaymentStatusPopover({
         })
       }
       
-      // Trigger data refresh
-      await refetchPayments()
+      // Only trigger parent optimistic update AFTER successful database operation
+      if (tenantId && onOptimisticUpdate) {
+        onOptimisticUpdate(tenantId, { isUtilitiesPaid: checked })
+      }
+      
+      // Trigger data refresh but don't await it to avoid interfering with UI
+      refetchPayments()
       onUpdate?.() // Notify parent component
       
       toast({
@@ -240,10 +237,7 @@ export function PaymentStatusPopover({
         duration: 2000,
       })
     } catch (error) {
-      // Revert optimistic state on error
-      if (tenantId && onOptimisticUpdate) {
-        onOptimisticUpdate(tenantId, { isUtilitiesPaid: !checked })
-      }
+      // Revert local state on error
       setLocalUtilitiesPaid(!checked)
       console.error('Error updating utilities payment:', error)
       toast({
