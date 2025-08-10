@@ -70,11 +70,14 @@ const Index = () => {
     selectedApartmentId === "all" ? true : tenant.rooms.apartment_id === selectedApartmentId
   )
 
-  // Filter bills for selected apartment
+  // Filter bills for selected apartment and month
   const { data: bills = [] } = useBills()
-  const filteredBills = bills.filter(bill => 
-    selectedApartmentId === "all" ? true : bill.apartment_id === selectedApartmentId
-  )
+  const filteredBills = bills.filter(bill => {
+    const billMonth = bill.due_date.slice(0, 7) // Extract YYYY-MM from due_date
+    const matchesMonth = billMonth === selectedMonth
+    const matchesApartment = selectedApartmentId === "all" ? true : bill.apartment_id === selectedApartmentId
+    return matchesMonth && matchesApartment
+  })
 
   // Calculate dashboard statistics for selected month
   const currentMonthPayments = payments.filter(p => {
@@ -100,7 +103,7 @@ const Index = () => {
     }
   })
   
-  // Calculate bills due and paid from actual bills data
+  // Calculate bills due and paid from filtered bills (by month and apartment)
   const totalBillsDue = filteredBills.filter(bill => !bill.is_paid).reduce((sum, bill) => sum + Number(bill.amount), 0)
   const totalBillsPaid = filteredBills.filter(bill => bill.is_paid).reduce((sum, bill) => sum + Number(bill.amount), 0)
 
