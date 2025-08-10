@@ -47,6 +47,54 @@ export type Database = {
         }
         Relationships: []
       }
+      bills: {
+        Row: {
+          amount: number
+          apartment_id: string
+          bill_type: string
+          created_at: string
+          due_date: string
+          id: string
+          is_paid: boolean | null
+          paid_date: string | null
+          period_end: string | null
+          period_start: string | null
+          provider: string
+          ready_to_pay: boolean | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          apartment_id: string
+          bill_type: string
+          created_at?: string
+          due_date: string
+          id?: string
+          is_paid?: boolean | null
+          paid_date?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          provider: string
+          ready_to_pay?: boolean | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          apartment_id?: string
+          bill_type?: string
+          created_at?: string
+          due_date?: string
+          id?: string
+          is_paid?: boolean | null
+          paid_date?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          provider?: string
+          ready_to_pay?: boolean | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       rent_payments: {
         Row: {
           amount: number

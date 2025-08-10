@@ -4,34 +4,28 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { useApartments } from "@/hooks/use-apartments"
+import { useApartments, useBills } from "@/hooks/use-apartments"
+import { EditBillDialog } from "@/components/forms/EditBillDialog"
 import { format } from "date-fns"
 
 const Bills = () => {
   const { data: apartments = [] } = useApartments()
+  const { data: bills = [] } = useBills()
   const [selectedApartmentId, setSelectedApartmentId] = useState<string>("all")
 
-  // Mock bills data for demonstration
-  const mockBills = [
-    { id: 1, apartmentId: apartments[0]?.id, name: "Water Company", type: "Water", amount: 85.50, dueDate: "2025-08-15", status: "pending" },
-    { id: 2, apartmentId: apartments[0]?.id, name: "Electricity Provider", type: "Electricity", amount: 156.80, dueDate: "2025-08-20", status: "paid" },
-    { id: 3, apartmentId: apartments[1]?.id, name: "Gas Natural", type: "Gas", amount: 89.50, dueDate: "2025-08-25", status: "pending" },
-    { id: 4, apartmentId: apartments[1]?.id, name: "Internet ISP", type: "Internet", amount: 45.00, dueDate: "2025-08-10", status: "paid" }
-  ]
-
-  const filteredBills = mockBills.filter(bill => 
-    selectedApartmentId === "all" ? true : bill.apartmentId === selectedApartmentId
+  const filteredBills = bills.filter(bill => 
+    selectedApartmentId === "all" ? true : bill.apartment_id === selectedApartmentId
   )
 
-  const getStatusColor = (status: string, dueDate: string) => {
-    if (status === "paid") return "bg-green-500/10 text-green-500 border-green-500/20"
-    if (new Date(dueDate) < new Date()) return "bg-red-500/10 text-red-500 border-red-500/20"
+  const getStatusColor = (bill: any) => {
+    if (bill.is_paid) return "bg-green-500/10 text-green-500 border-green-500/20"
+    if (new Date(bill.due_date) < new Date()) return "bg-red-500/10 text-red-500 border-red-500/20"
     return "bg-orange-500/10 text-orange-500 border-orange-500/20"
   }
 
-  const getStatusText = (status: string, dueDate: string) => {
-    if (status === "paid") return "Paid"
-    if (new Date(dueDate) < new Date()) return "Overdue"
+  const getStatusText = (bill: any) => {
+    if (bill.is_paid) return "Paid"
+    if (new Date(bill.due_date) < new Date()) return "Overdue"
     return "Pending"
   }
 
@@ -68,7 +62,7 @@ const Bills = () => {
       {filteredBills.length > 0 ? (
         <div className="grid gap-4">
           {filteredBills.map((bill) => {
-            const apartment = apartments.find(apt => apt.id === bill.apartmentId)
+            const apartment = apartments.find(apt => apt.id === bill.apartment_id)
             return (
               <Card key={bill.id} className="hover:shadow-md transition-shadow">
                 <CardContent className="p-6">
@@ -78,8 +72,8 @@ const Bills = () => {
                         <Receipt className="h-6 w-6 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-foreground">{bill.name}</h3>
-                        <p className="text-sm text-muted-foreground">{bill.type}</p>
+                        <h3 className="font-semibold text-foreground">{bill.provider}</h3>
+                        <p className="text-sm text-muted-foreground">{bill.bill_type}</p>
                         {apartment && (
                           <p className="text-xs text-muted-foreground mt-1">{apartment.name}</p>
                         )}
@@ -90,21 +84,23 @@ const Bills = () => {
                       <div className="text-right">
                         <div className="font-bold text-lg text-foreground">€{bill.amount}</div>
                         <div className="text-sm text-muted-foreground">
-                          Due {format(new Date(bill.dueDate), "MMM d, yyyy")}
+                          Due {format(new Date(bill.due_date), "MMM d, yyyy")}
                         </div>
                       </div>
                       
                       <Badge 
                         variant="outline" 
-                        className={getStatusColor(bill.status, bill.dueDate)}
+                        className={getStatusColor(bill)}
                       >
-                        {getStatusText(bill.status, bill.dueDate)}
+                        {getStatusText(bill)}
                       </Badge>
                       
                       <div className="flex gap-2">
-                        <Button variant="ghost" size="sm">
-                          <Edit className="h-4 w-4" />
-                        </Button>
+                        <EditBillDialog bill={bill}>
+                          <Button variant="ghost" size="sm">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </EditBillDialog>
                         <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700">
                           <Trash2 className="h-4 w-4" />
                         </Button>

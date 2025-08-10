@@ -51,6 +51,22 @@ export type RentPayment = {
   updated_at: string
 }
 
+export type Bill = {
+  id: string
+  apartment_id: string
+  provider: string
+  bill_type: string
+  amount: number
+  due_date: string
+  period_start: string | null
+  period_end: string | null
+  ready_to_pay: boolean
+  is_paid: boolean
+  paid_date: string | null
+  created_at: string
+  updated_at: string
+}
+
 export function useApartments() {
   return useQuery({
     queryKey: ["apartments"],
@@ -394,6 +410,58 @@ export function useUpdateTenant() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tenants'] })
       queryClient.invalidateQueries({ queryKey: ['rooms'] })
+    },
+  })
+}
+
+// Bills hooks
+export function useBills() {
+  return useQuery({
+    queryKey: ['bills'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('bills')
+        .select(`
+          *,
+          apartments:apartment_id(name, address)
+        `)
+        .order('due_date', { ascending: false })
+      
+      if (error) throw error
+      return data as any
+    },
+  })
+}
+
+export function useUpdateBill() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: async (billData: Partial<Bill> & { id: string }) => {
+      const { data, error } = await supabase
+        .from('bills')
+        .update({
+          apartment_id: billData.apartment_id,
+          provider: billData.provider,
+          bill_type: billData.bill_type,
+          amount: billData.amount,
+          due_date: billData.due_date,
+          period_start: billData.period_start,
+          period_end: billData.period_end,
+          ready_to_pay: billData.ready_to_pay,
+          is_paid: billData.is_paid,
+          paid_date: billData.paid_date,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', billData.id)
+        .select()
+        .single()
+      
+      if (error) throw error
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bills'] })
     },
   })
 }
