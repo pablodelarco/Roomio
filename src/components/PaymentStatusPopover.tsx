@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React, { useState } from "react"
 import { Check, X, MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
@@ -15,6 +15,7 @@ interface PaymentStatusPopoverProps {
   tenantId?: string
   selectedMonth?: string
   monthlyRent?: number
+  onUpdate?: () => void // Add callback to trigger parent refresh
 }
 
 export function PaymentStatusPopover({ 
@@ -24,14 +25,30 @@ export function PaymentStatusPopover({
   tenantName,
   tenantId,
   selectedMonth,
-  monthlyRent
+  monthlyRent,
+  onUpdate
 }: PaymentStatusPopoverProps) {
   const [open, setOpen] = useState(false)
+  const [localRentPaid, setLocalRentPaid] = useState(isRentPaid)
+  const [localUtilitiesPaid, setLocalUtilitiesPaid] = useState(isUtilitiesPaid)
+  const [isUpdating, setIsUpdating] = useState(false)
   const updatePayment = useUpdateRentPayment()
   const { refetch: refetchPayments } = useRentPayments()
   const { toast } = useToast()
 
+  // Sync local state with props when they change
+  React.useEffect(() => {
+    setLocalRentPaid(isRentPaid)
+    setLocalUtilitiesPaid(isUtilitiesPaid)
+  }, [isRentPaid, isUtilitiesPaid])
+
   const handleRentToggle = async (checked: boolean) => {
+    if (isUpdating) return // Prevent multiple simultaneous updates
+    
+    // Immediately update local state for instant UI feedback
+    setLocalRentPaid(checked)
+    setIsUpdating(true)
+    
     try {
       if (paymentId.includes('-')) {
         // Create new payment record
@@ -46,7 +63,7 @@ export function PaymentStatusPopover({
             due_date: dueDate,
             is_paid: checked,
             paid_date: checked ? new Date().toISOString().split('T')[0] : null,
-            utilities_paid: false
+            utilities_paid: localUtilitiesPaid
           })
           
         if (error) throw error
@@ -59,25 +76,38 @@ export function PaymentStatusPopover({
         })
       }
       
-      // Force refresh the payments data
+      // Trigger data refresh
       await refetchPayments()
+      onUpdate?.() // Notify parent component
       
       toast({
         description: `${tenantName} rent ${checked ? 'paid' : 'pending'}`,
         duration: 2000,
       })
-      setOpen(false)
+      
+      // Close popover after successful update
+      setTimeout(() => setOpen(false), 500)
     } catch (error) {
+      // Revert local state on error
+      setLocalRentPaid(!checked)
       console.error('Error updating rent payment:', error)
       toast({
         description: "Failed to update rent status",
         variant: "destructive",
         duration: 3000,
       })
+    } finally {
+      setIsUpdating(false)
     }
   }
 
   const handleUtilitiesToggle = async (checked: boolean) => {
+    if (isUpdating) return // Prevent multiple simultaneous updates
+    
+    // Immediately update local state for instant UI feedback
+    setLocalUtilitiesPaid(checked)
+    setIsUpdating(true)
+    
     try {
       if (paymentId.includes('-')) {
         // Create new payment record
@@ -90,9 +120,9 @@ export function PaymentStatusPopover({
             tenant_id: tenantId,
             amount: monthlyRent,
             due_date: dueDate,
-            is_paid: false,
+            is_paid: localRentPaid,
             utilities_paid: checked,
-            paid_date: null
+            paid_date: localRentPaid ? new Date().toISOString().split('T')[0] : null
           })
           
         if (error) throw error
@@ -104,21 +134,28 @@ export function PaymentStatusPopover({
         })
       }
       
-      // Force refresh the payments data
+      // Trigger data refresh
       await refetchPayments()
+      onUpdate?.() // Notify parent component
       
       toast({
         description: `${tenantName} utilities ${checked ? 'paid' : 'pending'}`,
         duration: 2000,
       })
-      setOpen(false)
+      
+      // Close popover after successful update
+      setTimeout(() => setOpen(false), 500)
     } catch (error) {
+      // Revert local state on error
+      setLocalUtilitiesPaid(!checked)
       console.error('Error updating utilities payment:', error)
       toast({
         description: "Failed to update utilities status",
         variant: "destructive",
         duration: 3000,
       })
+    } finally {
+      setIsUpdating(false)
     }
   }
 
@@ -137,9 +174,9 @@ export function PaymentStatusPopover({
             <Label htmlFor="rent-status" className="text-sm">Rent paid</Label>
             <Switch
               id="rent-status"
-              checked={isRentPaid}
+              checked={localRentPaid}
               onCheckedChange={handleRentToggle}
-              disabled={updatePayment.isPending}
+              disabled={isUpdating}
             />
           </div>
 
@@ -147,9 +184,9 @@ export function PaymentStatusPopover({
             <Label htmlFor="utilities-status" className="text-sm">Utilities paid</Label>
             <Switch
               id="utilities-status"
-              checked={isUtilitiesPaid}
+              checked={localUtilitiesPaid}
               onCheckedChange={handleUtilitiesToggle}
-              disabled={updatePayment.isPending}
+              disabled={isUpdating}
             />
           </div>
         </div>
