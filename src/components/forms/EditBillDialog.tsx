@@ -64,9 +64,9 @@ export function EditBillDialog({ bill, children }: EditBillDialogProps) {
     
     if (!formData.apartment_id || !formData.provider || !formData.bill_type || !formData.amount || !formData.due_date) {
       toast({
-        title: "Error",
         description: "Please fill in all required fields",
-        variant: "destructive"
+        variant: "destructive",
+        duration: 3000,
       })
       return
     }
@@ -87,17 +87,18 @@ export function EditBillDialog({ bill, children }: EditBillDialogProps) {
         paid_date: formData.is_paid ? new Date().toISOString().split('T')[0] : null
       })
 
+      // Less intrusive toast
       toast({
-        title: "Success",
-        description: "Bill updated successfully"
+        description: "Bill updated successfully",
+        duration: 2000,
       })
 
       setOpen(false)
     } catch (error) {
       toast({
-        title: "Error",
         description: "Failed to update bill",
-        variant: "destructive"
+        variant: "destructive",
+        duration: 3000,
       })
     }
   }
@@ -261,31 +262,13 @@ export function EditBillDialog({ bill, children }: EditBillDialogProps) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="ready_to_pay" className="text-sm">Ready to pay</Label>
-              <Switch
-                id="ready_to_pay"
-                checked={formData.ready_to_pay}
-                onCheckedChange={(checked) => setFormData({ ...formData, ready_to_pay: checked })}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="is_paid" className="text-sm">Paid</Label>
-              <Switch
-                id="is_paid"
-                checked={formData.is_paid}
-                onCheckedChange={(checked) => setFormData({ ...formData, is_paid: checked })}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="utilities_paid" className="text-sm">Utilities paid</Label>
-              <Switch
-                id="utilities_paid"
-                checked={formData.utilities_paid}
-                onCheckedChange={(checked) => setFormData({ ...formData, utilities_paid: checked })}
-              />
-            </div>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="is_paid" className="text-sm">Mark as paid</Label>
+            <Switch
+              id="is_paid"
+              checked={formData.is_paid}
+              onCheckedChange={(checked) => setFormData({ ...formData, is_paid: checked })}
+            />
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
