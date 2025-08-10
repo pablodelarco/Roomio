@@ -1,7 +1,9 @@
-import { Building2, Users, CreditCard, DollarSign, TrendingUp, AlertTriangle } from "lucide-react"
-import { StatCard } from "@/components/ui/stat-card"
+import { Building2, Users, DollarSign, TrendingUp, AlertTriangle, Calendar, Plus } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useApartments, useTenants, useRentPayments } from "@/hooks/use-apartments"
 
 const Index = () => {
@@ -10,132 +12,205 @@ const Index = () => {
   const { data: payments = [] } = useRentPayments()
 
   // Calculate dashboard statistics
-  const totalApartments = apartments.length
-  const totalTenants = tenants.length
-  const occupancyRate = totalTenants > 0 ? Math.round((totalTenants / apartments.reduce((sum, apt) => sum + apt.total_rooms, 0)) * 100) : 0
+  const totalRooms = apartments.reduce((sum, apt) => sum + apt.total_rooms, 0)
+  const occupancyRate = totalRooms > 0 ? Math.round((tenants.length / totalRooms) * 100) : 0
   
   const currentMonth = new Date().toISOString().slice(0, 7)
   const currentMonthPayments = payments.filter(p => p.due_date.startsWith(currentMonth))
   const paidPayments = currentMonthPayments.filter(p => p.is_paid)
-  const totalRevenue = paidPayments.reduce((sum, p) => sum + p.amount, 0)
   const pendingPayments = currentMonthPayments.filter(p => !p.is_paid)
+  
+  const totalRentDue = currentMonthPayments.reduce((sum, p) => sum + p.amount, 0)
+  const totalReceived = paidPayments.reduce((sum, p) => sum + p.amount, 0)
+  const totalBillsDue = apartments.reduce((sum, apt) => sum + apt.monthly_bills, 0)
+  const overdueCount = pendingPayments.filter(p => new Date(p.due_date) < new Date()).length
+
+  const currentMonthName = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Welcome back! Here's an overview of your rental properties.
-        </p>
+      {/* Header with Property Selector */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Property Dashboard</h1>
+          <p className="text-muted-foreground">
+            Track rent collection, bills, and tenant status
+          </p>
+        </div>
+        <div className="flex items-center gap-4">
+          <Select defaultValue="all">
+            <SelectTrigger className="w-64">
+              <Building2 className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="Select property" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Properties • {totalRooms} rooms</SelectItem>
+              {apartments.map((apt) => (
+                <SelectItem key={apt.id} value={apt.id}>
+                  {apt.name} • {apt.total_rooms} rooms
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          title="Total Apartments"
-          value={totalApartments}
-          icon={Building2}
-        />
-        <StatCard
-          title="Active Tenants"
-          value={totalTenants}
-          icon={Users}
-        />
-        <StatCard
-          title="Occupancy Rate"
-          value={`${occupancyRate}%`}
-          icon={TrendingUp}
-        />
-        <StatCard
-          title="Monthly Revenue"
-          value={`$${totalRevenue.toLocaleString()}`}
-          icon={DollarSign}
-        />
+      {/* Current Month Stats */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold flex items-center gap-2">
+          <Calendar className="h-5 w-5" />
+          {currentMonthName}
+        </h2>
+        
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
+          <Card className="bg-gradient-card">
+            <CardContent className="p-6">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Rent Due</p>
+                <p className="text-2xl font-bold">€{totalRentDue.toLocaleString()}</p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gradient-success">
+            <CardContent className="p-6">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-success-foreground">Received</p>
+                <p className="text-2xl font-bold text-success-foreground">€{totalReceived.toLocaleString()}</p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gradient-card">
+            <CardContent className="p-6">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Bills Due</p>
+                <p className="text-2xl font-bold text-warning">€{totalBillsDue.toLocaleString()}</p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gradient-card">
+            <CardContent className="p-6">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Overdue</p>
+                <p className="text-2xl font-bold text-destructive">{overdueCount}</p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gradient-card">
+            <CardContent className="p-6">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Occupancy</p>
+                <p className="text-2xl font-bold text-primary">{occupancyRate}%</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
-      {/* Recent Activity Grid */}
+      {/* Main Content Grid */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Recent Payments */}
+        {/* Tenant Rent Status */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5" />
-              Recent Payments
-            </CardTitle>
+            <CardTitle>Tenant Rent Status</CardTitle>
+            <p className="text-sm text-muted-foreground">{currentMonthName}</p>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {payments.slice(0, 5).map((payment) => (
-                <div key={payment.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                  <div>
-                    <p className="font-medium">
-                      {payment.tenants.first_name} {payment.tenants.last_name}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {payment.tenants.rooms.apartments.name} - Room {payment.tenants.rooms.room_number}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Due: {new Date(payment.due_date).toLocaleDateString()}
-                    </p>
+          <CardContent className="space-y-4">
+            {tenants.slice(0, 6).map((tenant) => {
+              const tenantPayment = currentMonthPayments.find(p => p.tenant_id === tenant.id)
+              const isPaid = tenantPayment?.is_paid || false
+              const amount = tenant.rooms.monthly_rent
+              
+              return (
+                <div key={tenant.id} className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10">
+                      <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
+                        {tenant.first_name[0]}{tenant.last_name[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium">{tenant.first_name} {tenant.last_name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Room {tenant.rooms.room_number} • €{amount}/month
+                      </p>
+                    </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold">${payment.amount}</p>
-                    <Badge variant={payment.is_paid ? "default" : "destructive"}>
-                      {payment.is_paid ? "Paid" : "Pending"}
+                    <p className="font-semibold">€{amount}</p>
+                    <Badge variant={isPaid ? "default" : "destructive"} className="text-xs">
+                      {isPaid ? "Paid" : "Pending"}
                     </Badge>
                   </div>
                 </div>
-              ))}
-              {payments.length === 0 && (
-                <p className="text-center text-muted-foreground py-4">
-                  No payment records yet
-                </p>
-              )}
-            </div>
+              )
+            })}
+            
+            {tenants.length === 0 && (
+              <div className="text-center py-8">
+                <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">No tenants yet</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Pending Actions */}
+        {/* Bills Status */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5" />
-              Pending Actions
-            </CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Bills Status</CardTitle>
+            </div>
+            <Button size="sm" className="gap-2">
+              <Plus className="h-4 w-4" />
+              Add Bill
+            </Button>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {pendingPayments.slice(0, 5).map((payment) => (
-                <div key={payment.id} className="flex items-center justify-between p-3 rounded-lg bg-warning/10 border border-warning/20">
-                  <div>
-                    <p className="font-medium">
-                      Rent Due: {payment.tenants.first_name} {payment.tenants.last_name}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {payment.tenants.rooms.apartments.name} - Room {payment.tenants.rooms.room_number}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Due: {new Date(payment.due_date).toLocaleDateString()}
-                    </p>
+          <CardContent className="space-y-4">
+            {apartments.slice(0, 4).map((apartment, index) => {
+              // Sample bills for demo
+              const bills = [
+                { type: 'Water', amount: 85.50, status: 'pending', initial: 'W' },
+                { type: 'Electricity', amount: 156.80, status: 'paid', initial: 'E' },
+                { type: 'Gas', amount: 89.50, status: 'pending', initial: 'G' },
+                { type: 'Internet', amount: 45.00, status: 'paid', initial: 'I' }
+              ]
+              
+              const bill = bills[index % bills.length]
+              const isPaid = bill.status === 'paid'
+              
+              return (
+                <div key={apartment.id} className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
+                      <span className="font-semibold text-sm">{bill.initial}</span>
+                    </div>
+                    <div>
+                      <p className="font-medium">{apartment.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {bill.type} • Due {new Date(Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-warning">${payment.amount}</p>
-                    <Badge variant="outline" className="border-warning text-warning">
-                      Overdue
+                    <p className="font-semibold">€{bill.amount}</p>
+                    <Badge variant={isPaid ? "default" : "destructive"} className="text-xs">
+                      {isPaid ? "Paid" : "Pending"}
                     </Badge>
                   </div>
                 </div>
-              ))}
-              {pendingPayments.length === 0 && (
-                <div className="text-center py-8">
-                  <div className="h-12 w-12 rounded-lg bg-success/10 flex items-center justify-center mx-auto mb-3">
-                    <TrendingUp className="h-6 w-6 text-success" />
-                  </div>
-                  <p className="font-medium text-success">All caught up!</p>
-                  <p className="text-sm text-muted-foreground">No pending payments this month</p>
-                </div>
-              )}
-            </div>
+              )
+            })}
+            
+            {apartments.length === 0 && (
+              <div className="text-center py-8">
+                <AlertTriangle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">No apartments yet</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
