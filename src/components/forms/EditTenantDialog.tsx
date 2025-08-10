@@ -146,58 +146,63 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Tenant</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label htmlFor="first_name">First Name *</Label>
+              <Label htmlFor="first_name" className="text-xs">First Name *</Label>
               <Input
                 id="first_name"
                 value={formData.first_name}
                 onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
                 required
+                className="h-8"
               />
             </div>
             <div>
-              <Label htmlFor="last_name">Last Name *</Label>
+              <Label htmlFor="last_name" className="text-xs">Last Name *</Label>
               <Input
                 id="last_name"
                 value={formData.last_name}
                 onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
                 required
+                className="h-8"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label htmlFor="email" className="text-xs">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="h-8"
+              />
+            </div>
+            <div>
+              <Label htmlFor="phone" className="text-xs">Phone</Label>
+              <Input
+                id="phone"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                className="h-8"
               />
             </div>
           </div>
 
           <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="phone">Phone</Label>
-            <Input
-              id="phone"
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="room">Room *</Label>
+            <Label htmlFor="room" className="text-xs">Room *</Label>
             <Select 
               value={formData.room_id} 
               onValueChange={(value) => setFormData({ ...formData, room_id: value })}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-8">
                 <SelectValue placeholder="Select a room" />
               </SelectTrigger>
               <SelectContent>
@@ -210,20 +215,20 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
             </Select>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Lease Start *</Label>
+              <Label className="text-xs">Lease Start *</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     className={cn(
-                      "w-full justify-start text-left font-normal",
+                      "w-full justify-start text-left font-normal h-8 text-xs",
                       !formData.lease_start && "text-muted-foreground"
                     )}
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formData.lease_start ? format(formData.lease_start, "PPP") : "Pick a date"}
+                    <CalendarIcon className="mr-1 h-3 w-3" />
+                    {formData.lease_start ? format(formData.lease_start, "PP") : "Pick date"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
@@ -238,18 +243,18 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
             </div>
 
             <div>
-              <Label>Lease End</Label>
+              <Label className="text-xs">Lease End</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     className={cn(
-                      "w-full justify-start text-left font-normal",
+                      "w-full justify-start text-left font-normal h-8 text-xs",
                       !formData.lease_end && "text-muted-foreground"
                     )}
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formData.lease_end ? format(formData.lease_end, "PPP") : "Pick a date"}
+                    <CalendarIcon className="mr-1 h-3 w-3" />
+                    {formData.lease_end ? format(formData.lease_end, "PP") : "Pick date"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
@@ -264,52 +269,54 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="deposit">Deposit Amount</Label>
-            <Input
-              id="deposit"
-              type="number"
-              step="0.01"
-              value={formData.deposit_amount}
-              onChange={(e) => setFormData({ ...formData, deposit_amount: e.target.value })}
-            />
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <Label htmlFor="deposit" className="text-xs">Deposit Amount</Label>
+              <Input
+                id="deposit"
+                type="number"
+                step="0.01"
+                value={formData.deposit_amount}
+                onChange={(e) => setFormData({ ...formData, deposit_amount: e.target.value })}
+                className="h-8"
+              />
+            </div>
+            <div className="flex items-center justify-between pt-4">
+              <Label htmlFor="deposit_paid" className="text-xs">Deposit Paid</Label>
+              <Switch
+                id="deposit_paid"
+                checked={formData.deposit_paid}
+                onCheckedChange={(checked) => setFormData({ ...formData, deposit_paid: checked })}
+              />
+            </div>
+            <div className="flex items-center justify-between pt-4">
+              <Label htmlFor="deposit_returned" className="text-xs">Deposit Returned</Label>
+              <Switch
+                id="deposit_returned"
+                checked={formData.deposit_returned}
+                onCheckedChange={(checked) => setFormData({ ...formData, deposit_returned: checked })}
+              />
+            </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <Label htmlFor="deposit_paid">Deposit Paid</Label>
-            <Switch
-              id="deposit_paid"
-              checked={formData.deposit_paid}
-              onCheckedChange={(checked) => setFormData({ ...formData, deposit_paid: checked })}
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <Label htmlFor="deposit_returned">Deposit Returned</Label>
-            <Switch
-              id="deposit_returned"
-              checked={formData.deposit_returned}
-              onCheckedChange={(checked) => setFormData({ ...formData, deposit_returned: checked })}
-            />
-          </div>
-
-          <div className="p-4 border rounded-lg bg-muted/20">
-            <h4 className="font-medium mb-3">Current Month Payment Status</h4>
-            <div className="space-y-3">
+          <div className="p-3 border rounded-lg bg-muted/20">
+            <h4 className="font-medium mb-2 text-sm">Current Month Payment Status</h4>
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm">Rent Amount:</span>
-                <span className="font-medium">€{tenant.rooms.monthly_rent}</span>
+                <span className="text-xs">Rent Amount:</span>
+                <span className="font-medium text-sm">€{tenant.rooms.monthly_rent}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm">Payment Status:</span>
+                <span className="text-xs">Payment Status:</span>
                 <div className="flex items-center gap-2">
-                  <span className={`text-sm px-2 py-1 rounded ${isRentPaid ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
+                  <span className={`text-xs px-2 py-1 rounded ${isRentPaid ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
                     {isRentPaid ? 'Paid' : 'Pending'}
                   </span>
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
+                    className="h-6 px-2 text-xs"
                     onClick={() => handleRentPaymentToggle(!isRentPaid)}
                     disabled={updatePayment.isPending}
                   >
@@ -320,11 +327,11 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
             </div>
           </div>
 
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button type="button" variant="outline" onClick={() => setOpen(false)} className="h-8 px-3 text-xs">
               Cancel
             </Button>
-            <Button type="submit" disabled={updateTenant.isPending}>
+            <Button type="submit" disabled={updateTenant.isPending} className="h-8 px-3 text-xs">
               {updateTenant.isPending ? "Updating..." : "Update Tenant"}
             </Button>
           </div>
