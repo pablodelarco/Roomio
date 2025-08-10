@@ -6,9 +6,27 @@ import { useToast } from "@/hooks/use-toast"
 import { format } from "date-fns"
 
 const Payments = () => {
-  const { data: payments = [], isLoading } = useRentPayments()
+  const { data: allPayments = [], isLoading } = useRentPayments()
   const updatePayment = useUpdateRentPayment()
   const { toast } = useToast()
+
+  // Deduplicate payments - keep only the most recent payment for each tenant per month
+  const payments = allPayments.reduce((acc, payment) => {
+    const key = `${payment.tenant_id}-${payment.due_date.slice(0, 7)}` // tenant_id + YYYY-MM
+    const existing = acc.find(p => `${p.tenant_id}-${p.due_date.slice(0, 7)}` === key)
+    
+    if (!existing) {
+      acc.push(payment)
+    } else {
+      // Keep the one with the latest updated_at timestamp
+      if (new Date(payment.updated_at) > new Date(existing.updated_at)) {
+        const index = acc.findIndex(p => `${p.tenant_id}-${p.due_date.slice(0, 7)}` === key)
+        acc[index] = payment
+      }
+    }
+    
+    return acc
+  }, [] as typeof allPayments)
 
   const handleMarkAsPaid = async (id: string) => {
     try {
@@ -18,14 +36,14 @@ const Payments = () => {
         paid_date: new Date().toISOString().split('T')[0]
       })
       toast({
-        title: "Success",
         description: "Payment marked as paid",
+        duration: 2000,
       })
     } catch (error) {
       toast({
-        title: "Error",
         description: "Failed to update payment",
         variant: "destructive",
+        duration: 3000,
       })
     }
   }
