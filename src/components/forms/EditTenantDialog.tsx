@@ -11,6 +11,7 @@ import { format } from "date-fns"
 import { useUpdateTenant, useApartments, useRooms, type Tenant } from "@/hooks/use-apartments"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
+import { Switch } from "@/components/ui/switch"
 
 interface EditTenantDialogProps {
   tenant: Tenant & { 
@@ -22,9 +23,10 @@ interface EditTenantDialogProps {
     }
   }
   children?: React.ReactNode
+  showPaymentStatus?: boolean
 }
 
-export function EditTenantDialog({ tenant, children }: EditTenantDialogProps) {
+export function EditTenantDialog({ tenant, children, showPaymentStatus = false }: EditTenantDialogProps) {
   const [open, setOpen] = useState(false)
   const [formData, setFormData] = useState({
     first_name: "",
@@ -240,6 +242,30 @@ export function EditTenantDialog({ tenant, children }: EditTenantDialogProps) {
               onChange={(e) => setFormData({ ...formData, deposit_amount: e.target.value })}
             />
           </div>
+
+          <div className="flex items-center justify-between">
+            <Label htmlFor="deposit_paid">Deposit Paid</Label>
+            <Switch
+              id="deposit_paid"
+              checked={formData.deposit_paid}
+              onCheckedChange={(checked) => setFormData({ ...formData, deposit_paid: checked })}
+            />
+          </div>
+
+          {showPaymentStatus && (
+            <div className="p-4 border rounded-lg bg-muted/20">
+              <h4 className="font-medium mb-2">Current Month Payment Status</h4>
+              <p className="text-sm text-muted-foreground mb-2">
+                Rent: €{tenant.rooms.monthly_rent}
+              </p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Payment Received</span>
+                <Button variant="outline" size="sm">
+                  Mark as Paid
+                </Button>
+              </div>
+            </div>
+          )}
 
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>

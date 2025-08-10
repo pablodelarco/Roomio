@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useTenants, useDeleteTenant } from "@/hooks/use-apartments"
 import { AddTenantDialog } from "@/components/forms/AddTenantDialog"
+import { EditTenantDialog } from "@/components/forms/EditTenantDialog"
 import { useToast } from "@/hooks/use-toast"
 import { format } from "date-fns"
 
@@ -129,9 +130,11 @@ const Tenants = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button size="sm" variant="ghost">
-                      <Edit className="h-4 w-4" />
-                    </Button>
+                    <EditTenantDialog tenant={tenant}>
+                      <Button size="sm" variant="ghost">
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    </EditTenantDialog>
                     <Button 
                       size="sm" 
                       variant="ghost"
