@@ -105,26 +105,39 @@ const Index = () => {
         )}
 
         {/* Stats Row */}
-        <div className="grid grid-cols-5 gap-4 mb-6">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-white">€{totalRentDue.toLocaleString()}</div>
-            <div className="text-gray-400 text-xs">Rent Due</div>
+        <div className="grid grid-cols-2 gap-6 mb-6">
+          {/* Rent Section */}
+          <div className="bg-card rounded-xl p-4">
+            <h3 className="text-sm font-medium text-muted-foreground mb-3">Rent</h3>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center">
+                <div className="text-xl font-bold text-white">€{totalRentDue.toLocaleString()}</div>
+                <div className="text-muted-foreground text-xs">Due</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xl font-bold text-green-500">€{totalReceived.toLocaleString()}</div>
+                <div className="text-muted-foreground text-xs">Received</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xl font-bold text-red-500">{overdueCount}</div>
+                <div className="text-muted-foreground text-xs">Overdue</div>
+              </div>
+            </div>
           </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-green-500">€{totalReceived.toLocaleString()}</div>
-            <div className="text-gray-400 text-xs">Received</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-orange-500">€{totalBillsDue.toLocaleString()}</div>
-            <div className="text-gray-400 text-xs">Bills Due</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-red-500">{overdueCount}</div>
-            <div className="text-gray-400 text-xs">Overdue</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-500">{occupancyRate}%</div>
-            <div className="text-gray-400 text-xs">Occupancy</div>
+
+          {/* Utilities Section */}
+          <div className="bg-card rounded-xl p-4">
+            <h3 className="text-sm font-medium text-muted-foreground mb-3">Utilities</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center">
+                <div className="text-xl font-bold text-orange-500">€{totalBillsDue.toLocaleString()}</div>
+                <div className="text-muted-foreground text-xs">Bills Due</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xl font-bold text-blue-500">{occupancyRate}%</div>
+                <div className="text-muted-foreground text-xs">Occupancy</div>
+              </div>
+            </div>
           </div>
         </div>
 
