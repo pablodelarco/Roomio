@@ -66,8 +66,20 @@ const Index = () => {
   const paidPayments = currentMonthPayments.filter(p => p.is_paid)
   const pendingPayments = currentMonthPayments.filter(p => !p.is_paid)
   
-  const totalRentDue = pendingPayments.reduce((sum, p) => sum + p.amount, 0)
-  const totalReceived = paidPayments.reduce((sum, p) => sum + p.amount, 0)
+  // Calculate rent properly based on actual tenants and their latest payment status
+  let totalRentDue = 0
+  let totalReceived = 0
+  
+  apartmentTenants.forEach(tenant => {
+    const monthlyRent = tenant.rooms.monthly_rent
+    const tenantPayment = currentMonthPayments.find(p => p.tenant_id === tenant.id)
+    
+    if (tenantPayment?.is_paid) {
+      totalReceived += monthlyRent
+    } else {
+      totalRentDue += monthlyRent
+    }
+  })
   
   // Calculate bills due and paid from actual bills data
   const totalBillsDue = filteredBills.filter(bill => !bill.is_paid).reduce((sum, bill) => sum + Number(bill.amount), 0)
