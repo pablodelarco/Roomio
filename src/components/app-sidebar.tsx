@@ -10,7 +10,11 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarFooter,
 } from "@/components/ui/sidebar"
+import { useAuth } from "@/contexts/AuthContext"
+import { Button } from "@/components/ui/button"
+import { LogOut, User } from "lucide-react"
 
 const navigationItems = [
   { title: "Dashboard", url: "/", icon: Home },
@@ -24,12 +28,16 @@ const navigationItems = [
 
 export function AppSidebar() {
   const location = useLocation()
-  const currentPath = location.pathname
+  const { user, signOut } = useAuth();
 
   const getNavCls = (props: { isActive: boolean }) =>
     props.isActive 
       ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" 
       : "hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-colors"
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
   return (
     <Sidebar
@@ -71,6 +79,25 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <div className="flex items-center gap-2 px-2 py-1.5 text-sm text-sidebar-foreground">
+              <User className="h-4 w-4" />
+              <span className="truncate">{user?.email}</span>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleSignOut}
+              className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            >
+              <LogOut className="h-4 w-4" />
+              Sign Out
+            </Button>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarFooter>
     </Sidebar>
   )
 }
