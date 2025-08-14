@@ -93,24 +93,34 @@ export default function Auth() {
     setError(null);
 
     try {
+      console.log('Attempting Google sign in with redirect URL:', `${window.location.origin}/`);
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`
+          redirectTo: `${window.location.origin}/`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         }
       });
 
       if (error) {
+        console.error('Google OAuth error:', error);
         if (error.message.includes('provider is not enabled')) {
           setError('Google sign-in is not configured. Please contact the administrator to enable Google authentication.');
+        } else if (error.message.includes('Invalid login credentials')) {
+          setError('Unable to connect to Google. Please check your Google OAuth configuration.');
         } else {
-          setError(error.message);
+          setError(`Google sign-in error: ${error.message}`);
         }
         setLoading(false);
       }
       // Note: If successful, the redirect will happen automatically, so we don't need to handle success here
-    } catch (error) {
-      setError('An unexpected error occurred with Google sign in.');
+    } catch (error: any) {
+      console.error('Unexpected Google sign in error:', error);
+      setError(`An unexpected error occurred with Google sign in: ${error?.message || 'Unknown error'}`);
       setLoading(false);
     }
   };
