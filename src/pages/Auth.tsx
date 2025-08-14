@@ -101,9 +101,14 @@ export default function Auth() {
       });
 
       if (error) {
-        setError(error.message);
+        if (error.message.includes('provider is not enabled')) {
+          setError('Google sign-in is not configured. Please contact the administrator to enable Google authentication.');
+        } else {
+          setError(error.message);
+        }
         setLoading(false);
       }
+      // Note: If successful, the redirect will happen automatically, so we don't need to handle success here
     } catch (error) {
       setError('An unexpected error occurred with Google sign in.');
       setLoading(false);
