@@ -14,15 +14,17 @@ namePrefix: dev-
 commonLabels:
   environment: development
 
-patchesStrategicMerge:
-- deployment-patch.yaml
-- ingress-patch.yaml
-- configmap-patch.yaml
-
 images:
-- name: ghcr.io/your-username/staywell-manager
-  newTag: develop-latest
+- name: ghcr.io/pablodelarco/staywell-manager
+  newName: ghcr.io/pablodelarco/staywell-manager
+  newTag: latest
 
 replicas:
 - name: staywell-frontend
   count: 1
+
+patchesStrategicMerge:
+- deployment-patch.yaml
+- ingress-patch.yaml
+- configmap-patch.yaml
+- image-policy-patch.yaml

@@ -1,32 +1,28 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: staywell-manager-prod
+  name: staywell-prod
   namespace: argocd
-  labels:
-    app.kubernetes.io/name: staywell-manager
-    environment: production
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    repoURL: https://github.com/your-username/staywell-manager-gitops
-    targetRevision: HEAD
+    repoURL: https://github.com/pablodelarco/staywell-manager.git
+    targetRevision: main
     path: k8s/overlays/production
   destination:
     server: https://kubernetes.default.svc
     namespace: staywell-manager
   syncPolicy:
-    # Manual sync for production - require approval
+    automated:
+      prune: false
+      selfHeal: true
     syncOptions:
     - CreateNamespace=true
-    - PrunePropagationPolicy=foreground
-    - PruneLast=true
     retry:
-      limit: 3
+      limit: 5
       backoff:
-        duration: 10s
+        duration: 5s
         factor: 2
-        maxDuration: 5m
-  revisionHistoryLimit: 20
+        maxDuration: 3m

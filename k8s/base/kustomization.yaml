@@ -17,5 +17,10 @@ commonLabels:
   app.kubernetes.io/part-of: staywell-platform
 
 images:
-- name: ghcr.io/your-username/staywell-manager
+- name: ghcr.io/pablodelarco/staywell-manager
   newTag: latest
+
+
+
+
+  

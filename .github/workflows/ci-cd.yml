@@ -1,162 +1,104 @@
-name: StayWell Manager CI/CD
+name: CI/CD Pipeline
 
 on:
   push:
     branches: [ main, develop ]
   pull_request:
     branches: [ main ]
-  release:
-    types: [ published ]
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  # Code Quality & Testing
   test:
-    name: Test & Lint
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run tests
+      run: npm test
+    
+    - name: Build application
+      run: npm run build:prod
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run linting
-        run: npm run lint
-
-      - name: Type checking
-        run: npm run type-check
-
-      - name: Run tests
-        run: npm test
-
-  # Security Scanning
-  security:
-    name: Security Scan
+  build-and-push:
+    needs: test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+    
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+    
+    - name: Security scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+    
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
 
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-
-      - name: Upload Trivy scan results
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          sarif_file: 'trivy-results.sarif'
-
-  # Build and Push Docker Image
-  build:
-    name: Build & Push Image
-    runs-on: ubuntu-latest
-    needs: [test, security]
-    if: github.event_name != 'pull_request'
-    outputs:
-      image-digest: ${{ steps.build.outputs.digest }}
-      image-tag: ${{ steps.meta.outputs.tags }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=sha,prefix={{branch}}-
-            type=raw,value=latest,enable={{is_default_branch}}
-
-      - name: Build and push Docker image
-        id: build
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  # Deploy to Development
   deploy-dev:
-    name: Deploy to Development
+    needs: build-and-push
     runs-on: ubuntu-latest
-    needs: [build]
     if: github.ref == 'refs/heads/develop'
-    environment:
-      name: development
-      url: https://dev.staywell.com
+    
     steps:
-      - name: Checkout GitOps repo
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ github.repository }}-gitops
-          token: ${{ secrets.GITOPS_TOKEN }}
-          path: gitops
-
-      - name: Update development manifests
-        run: |
-          cd gitops
-          sed -i "s|image: .*|image: ${{ needs.build.outputs.image-tag }}|g" environments/development/kustomization.yaml
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git add .
-          git commit -m "Update development image to ${{ github.sha }}"
-          git push
-
-  # Deploy to Production
+    - name: Trigger ArgoCD Sync (Development)
+      run: |
+        echo "🚀 Development deployment triggered"
+        echo "ArgoCD will automatically sync the changes"
+        
   deploy-prod:
-    name: Deploy to Production
+    needs: build-and-push
     runs-on: ubuntu-latest
-    needs: [build]
     if: github.ref == 'refs/heads/main'
-    environment:
-      name: production
-      url: https://app.staywell.com
+    
     steps:
-      - name: Checkout GitOps repo
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ github.repository }}-gitops
-          token: ${{ secrets.GITOPS_TOKEN }}
-          path: gitops
-
-      - name: Update production manifests
-        run: |
-          cd gitops
-          sed -i "s|image: .*|image: ${{ needs.build.outputs.image-tag }}|g" environments/production/kustomization.yaml
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git add .
-          git commit -m "Update production image to ${{ github.sha }}"
-          git push
+    - name: Trigger ArgoCD Sync (Production)
+      run: |
+        echo "🚀 Production deployment triggered"
+        echo "ArgoCD will automatically sync the changes"

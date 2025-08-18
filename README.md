@@ -1,73 +1,99 @@
-# Welcome to your Lovable project
+# 🏠 StayWell Manager - Homelab SaaS
 
-## Project info
+A modern property management SaaS application deployed on a homelab K3s cluster using GitOps.
 
-**URL**: https://lovable.dev/projects/f331f974-531e-4e6c-8b4e-4f588d04f628
+## 🏗️ Architecture
 
-## How can I edit this code?
+- **Frontend**: React + TypeScript + Vite
+- **Backend**: Supabase (Database + Auth)
+- **Container**: Docker with nginx
+- **Orchestration**: Kubernetes (K3s)
+- **GitOps**: ArgoCD
+- **CI/CD**: GitHub Actions
+- **Registry**: GitHub Container Registry (GHCR)
 
-There are several ways of editing your application.
+## 🚀 Deployment
 
-**Use Lovable**
+### Automatic Deployment (GitOps)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f331f974-531e-4e6c-8b4e-4f588d04f628) and start prompting.
+1. **Push to `develop` branch** → Deploys to development environment
+2. **Push to `main` branch** → Deploys to production environment
+3. **ArgoCD** automatically syncs changes to the K3s cluster
 
-Changes made via Lovable will be committed automatically to this repo.
+### Manual Deployment
 
-**Use your preferred IDE**
+```bash
+# Deploy to development
+kubectl apply -k k8s/overlays/development
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+# Deploy to production
+kubectl apply -k k8s/overlays/production
 ```
 
-**Edit a file directly in GitHub**
+## 🔧 Development
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+# Install dependencies
+npm install
 
-**Use GitHub Codespaces**
+# Start development server
+npm run dev
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+# Build for production
+npm run build:prod
 
-## What technologies are used for this project?
+# Run tests
+npm test
 
-This project is built with:
+# Build container
+docker build -t staywell-manager .
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🌐 Access
 
-## How can I deploy this project?
+- **Development**: http://dev.staywell.local
+- **Production**: http://staywell.local
+- **ArgoCD**: http://192.168.1.238
 
-Simply open [Lovable](https://lovable.dev/projects/f331f974-531e-4e6c-8b4e-4f588d04f628) and click on Share -> Publish.
+## 📊 Monitoring
 
-## Can I connect a custom domain to my Lovable project?
+- **Kubernetes Dashboard**: Available via ArgoCD
+- **Application Logs**: `kubectl logs -f deployment/staywell-frontend -n staywell-manager-dev`
+- **Health Checks**: Built into the container
 
-Yes, you can!
+## 🔐 Security
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- **Container Scanning**: Trivy security scans in CI/CD
+- **Non-root User**: Container runs as nginx user
+- **Network Policies**: Kubernetes network isolation
+- **Secrets Management**: Kubernetes secrets for sensitive data
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 🏠 Homelab Infrastructure
+
+- **Cluster**: 2-node K3s (beelink + worker)
+- **Ingress**: Traefik LoadBalancer
+- **GitOps**: ArgoCD
+- **SSL**: cert-manager
+- **Remote Access**: Tailscale
+
+## 📝 Environment Variables
+
+Create these secrets in Kubernetes:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: staywell-secrets
+data:
+  supabase-url: <base64-encoded-url>
+  supabase-anon-key: <base64-encoded-key>
+```
+
+## 🎯 Next Steps
+
+- [ ] Set up monitoring with Prometheus/Grafana
+- [ ] Configure custom domain with SSL
+- [ ] Add backup strategy
+- [ ] Implement blue-green deployments
+- [ ] Set up alerting

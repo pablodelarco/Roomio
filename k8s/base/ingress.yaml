@@ -2,7 +2,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: staywell-ingress
-  namespace: staywell-manager
   labels:
     app.kubernetes.io/name: staywell-manager
     app.kubernetes.io/component: ingress
@@ -36,6 +35,7 @@ spec:
   - hosts:
     - app.staywell.com
     secretName: staywell-tls
+    
   rules:
   - host: app.staywell.com
     http:

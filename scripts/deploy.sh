@@ -13,8 +13,8 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 # Configuration
-DOCKER_IMAGE="ghcr.io/your-username/staywell-manager"
-GITOPS_REPO="https://github.com/your-username/staywell-manager-gitops.git"
+DOCKER_IMAGE="ghcr.io/pablodelarco/staywell-manager"
+GITOPS_REPO="https://github.com/pablodelarco/staywell-manager-gitops.git"
 
 # Functions
 log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }

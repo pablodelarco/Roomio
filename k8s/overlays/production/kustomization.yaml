@@ -22,7 +22,7 @@ patchesStrategicMerge:
 - configmap-patch.yaml
 
 images:
-- name: ghcr.io/your-username/staywell-manager
+- name: ghcr.io/pablodelarco/staywell-manager
   newTag: main-latest
 
 replicas:

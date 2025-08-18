@@ -1,7 +1,7 @@
 # StayWell Manager - Development & Deployment Makefile
 
 # Variables
-DOCKER_IMAGE = ghcr.io/your-username/staywell-manager
+DOCKER_IMAGE = ghcr.io/pablodelarco/staywell-manager
 VERSION ?= latest
 NAMESPACE_DEV = staywell-manager-dev
 NAMESPACE_PROD = staywell-manager

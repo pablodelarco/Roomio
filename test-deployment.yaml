@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: staywell-test
+  namespace: staywell-manager-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: staywell-test
+  template:
+    metadata:
+      labels:
+        app: staywell-test
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: html
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: html
+        configMap:
+          name: test-html
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-html
+  namespace: staywell-manager-dev
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>StayWell Manager - Homelab Test</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+            .container { max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+            h1 { color: #2c3e50; text-align: center; }
+            .status { background: #27ae60; color: white; padding: 20px; border-radius: 5px; text-align: center; margin: 20px 0; }
+            .info { background: #3498db; color: white; padding: 15px; border-radius: 5px; margin: 10px 0; }
+            .next-steps { background: #f39c12; color: white; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🏠 StayWell Manager - Homelab Deployment</h1>
+            
+            <div class="status">
+                ✅ SUCCESS: Your K3s cluster is working perfectly!
+            </div>
+            
+            <div class="info">
+                <strong>🎯 Infrastructure Status:</strong><br>
+                • Kubernetes: ✅ Running<br>
+                • Traefik Ingress: ✅ Active<br>
+                • ArgoCD: ✅ Available<br>
+                • cert-manager: ✅ Ready<br>
+                • Tailscale: ✅ Connected
+            </div>
+            
+            <div class="info">
+                <strong>🌐 Access Information:</strong><br>
+                • Cluster: 2-node K3s (beelink + worker)<br>
+                • Traefik LoadBalancer: 192.168.1.237<br>
+                • ArgoCD: 192.168.1.238<br>
+                • This test app is running in your homelab!
+            </div>
+            
+            <div class="next-steps">
+                <strong>🚀 Next Steps:</strong><br>
+                1. Deploy your actual StayWell Manager application<br>
+                2. Set up GitOps with ArgoCD<br>
+                3. Configure domain and SSL<br>
+                4. Add monitoring and observability
+            </div>
+            
+            <p style="text-align: center; color: #7f8c8d; margin-top: 40px;">
+                <strong>Congratulations!</strong> Your homelab infrastructure is production-ready! 🎉
+            </p>
+        </div>
+    </body>
+    </html>
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: staywell-test-service
+  namespace: staywell-manager-dev
+spec:
+  selector:
+    app: staywell-test
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: staywell-test-ingress
+  namespace: staywell-manager-dev
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  rules:
+  - host: staywell.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: staywell-test-service
+            port:
+              number: 80

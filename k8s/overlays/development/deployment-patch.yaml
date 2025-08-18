@@ -7,13 +7,6 @@ spec:
     spec:
       containers:
       - name: frontend
-        env:
-        - name: VITE_APP_ENVIRONMENT
-          value: "development"
-        - name: VITE_DEBUG_MODE
-          value: "true"
-        - name: VITE_LOG_LEVEL
-          value: "debug"
         resources:
           requests:
             memory: "64Mi"

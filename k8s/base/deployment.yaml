@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: staywell-frontend
-  namespace: staywell-manager
   labels:
     app.kubernetes.io/name: staywell-frontend
     app.kubernetes.io/component: frontend
     app.kubernetes.io/part-of: staywell-platform
+
 spec:
   replicas: 2
   strategy:
@@ -28,14 +28,16 @@ spec:
         runAsNonRoot: true
         runAsUser: 101
         fsGroup: 101
+
       containers:
       - name: frontend
-        image: ghcr.io/your-username/staywell-manager:latest
+        image: ghcr.io/pablodelarco/staywell-manager:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
           name: http
           protocol: TCP
+
         env:
         - name: NODE_ENV
           value: "production"
@@ -54,6 +56,7 @@ spec:
             secretKeyRef:
               name: staywell-secrets
               key: supabase-anon-key
+
         resources:
           requests:
             memory: "128Mi"
@@ -61,6 +64,7 @@ spec:
           limits:
             memory: "256Mi"
             cpu: "200m"
+
         livenessProbe:
           httpGet:
             path: /
@@ -77,6 +81,7 @@ spec:
           periodSeconds: 5
           timeoutSeconds: 3
           failureThreshold: 3
+          
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
