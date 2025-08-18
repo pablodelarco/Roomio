@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: staywell-config
+data:
+  environment: "development"
+  debug-mode: "true"
+  log-level: "debug"
+  enable-analytics: "false"

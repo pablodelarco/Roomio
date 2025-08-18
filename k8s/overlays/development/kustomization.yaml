@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: staywell-development
+
+namespace: staywell-manager-dev
+
+resources:
+- ../../base
+
+namePrefix: dev-
+
+commonLabels:
+  environment: development
+
+patchesStrategicMerge:
+- deployment-patch.yaml
+- ingress-patch.yaml
+- configmap-patch.yaml
+
+images:
+- name: ghcr.io/your-username/staywell-manager
+  newTag: develop-latest
+
+replicas:
+- name: staywell-frontend
+  count: 1

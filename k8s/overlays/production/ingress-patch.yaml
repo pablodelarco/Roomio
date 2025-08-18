@@ -1,0 +1,36 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: staywell-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/rate-limit: "200"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+spec:
+  tls:
+  - hosts:
+    - app.staywell.com
+    - "*.staywell.com"
+    secretName: staywell-prod-tls
+  rules:
+  - host: app.staywell.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: prod-staywell-frontend-service
+            port:
+              number: 80
+  # Wildcard for tenant subdomains (future multi-tenancy)
+  - host: "*.staywell.com"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: prod-staywell-frontend-service
+            port:
+              number: 80

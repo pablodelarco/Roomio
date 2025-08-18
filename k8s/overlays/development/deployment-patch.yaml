@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: staywell-frontend
+spec:
+  template:
+    spec:
+      containers:
+      - name: frontend
+        env:
+        - name: VITE_APP_ENVIRONMENT
+          value: "development"
+        - name: VITE_DEBUG_MODE
+          value: "true"
+        - name: VITE_LOG_LEVEL
+          value: "debug"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
