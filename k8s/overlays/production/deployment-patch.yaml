@@ -8,7 +8,7 @@ spec:
       containers:
       - name: frontend
         env:
-        - name: VITE_APP_ENVIRONMENT
+        - name: NODE_ENV
           value: "production"
         - name: VITE_DEBUG_MODE
           value: "false"

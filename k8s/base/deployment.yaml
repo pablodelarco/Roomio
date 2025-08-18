@@ -34,7 +34,7 @@ spec:
 
       containers:
       - name: frontend
-        image: ghcr.io/pablodelarco/staywell-manager:latest
+        image: ghcr.io/pablodelarco/staywell-manager-e301a7db:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

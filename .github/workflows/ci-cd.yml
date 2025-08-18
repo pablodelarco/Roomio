@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: staywell-manager
+  IMAGE_NAME: staywell-manager-e301a7db
 
 jobs:
   test:
@@ -58,7 +58,7 @@ jobs:
         tags: |
           type=ref,event=branch
           type=ref,event=pr
-          type=sha,prefix={{branch}}-
+          type=sha
           type=raw,value=latest,enable={{is_default_branch}}
         flavor: |
           latest=auto
