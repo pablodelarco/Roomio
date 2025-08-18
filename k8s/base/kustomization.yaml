@@ -10,8 +10,8 @@ resources:
 - service.yaml
 - configmap.yaml
 - secret.yaml
-- registry-secret.yaml
 - ingress.yaml
+- tailscale-ingress.yaml
 
 commonLabels:
   app.kubernetes.io/name: staywell-manager

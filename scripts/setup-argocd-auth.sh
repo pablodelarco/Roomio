@@ -34,7 +34,7 @@ if [ -z "$GITHUB_TOKEN" ]; then
     echo "   - Copy the generated token"
     echo ""
     echo "2. Run this script with your token:"
-    echo "   GITHUB_TOKEN=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 ./scripts/setup-argocd-auth.sh"
+    echo "   GITHUB_TOKEN=YOUR_GITHUB_TOKEN ./scripts/setup-argocd-auth.sh"
     echo ""
     echo "3. Or apply the secret manually:"
     echo "   kubectl create secret generic staywell-repo-secret \\"
