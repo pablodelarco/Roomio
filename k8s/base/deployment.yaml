@@ -29,6 +29,9 @@ spec:
         runAsUser: 101
         fsGroup: 101
 
+      imagePullSecrets:
+      - name: ghcr-secret
+
       containers:
       - name: frontend
         image: ghcr.io/pablodelarco/staywell-manager:latest
