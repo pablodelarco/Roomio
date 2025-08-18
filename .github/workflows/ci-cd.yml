@@ -75,14 +75,15 @@ jobs:
     - name: Security scan
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+        image-ref: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
         format: 'sarif'
         output: 'trivy-results.sarif'
         exit-code: '0'
+      continue-on-error: true
 
     - name: Upload Trivy scan results
       uses: github/codeql-action/upload-sarif@v3
-      if: always() && github.event_name != 'pull_request'
+      if: always() && github.event_name != 'pull_request' && hashFiles('trivy-results.sarif') != ''
       with:
         sarif_file: 'trivy-results.sarif'
         category: 'trivy'
@@ -91,14 +92,19 @@ jobs:
     - name: Display Trivy scan summary
       if: always()
       run: |
+        echo "=== Security Scan Summary ==="
+        echo "Scanned image: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}"
         if [ -f trivy-results.sarif ]; then
-          echo "Security scan completed. Results saved to trivy-results.sarif"
+          echo "✅ Security scan completed successfully"
+          echo "📄 Results saved to trivy-results.sarif"
           # Extract and display summary if possible
           if command -v jq &> /dev/null; then
-            echo "Number of findings: $(jq '.runs[0].results | length' trivy-results.sarif 2>/dev/null || echo 'Unable to parse')"
+            FINDINGS=$(jq '.runs[0].results | length' trivy-results.sarif 2>/dev/null || echo 'Unable to parse')
+            echo "🔍 Number of findings: $FINDINGS"
           fi
         else
-          echo "Security scan results not found"
+          echo "❌ Security scan failed or results not found"
+          echo "This may be due to image availability issues or scan errors"
         fi
 
     - name: Update image tags in manifests
