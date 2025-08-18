@@ -23,7 +23,7 @@ patchesStrategicMerge:
 
 images:
 - name: ghcr.io/pablodelarco/staywell-manager
-  newTag: main-latest
+  newTag: main
 
 replicas:
 - name: staywell-frontend

@@ -17,7 +17,7 @@ commonLabels:
 images:
 - name: ghcr.io/pablodelarco/staywell-manager
   newName: ghcr.io/pablodelarco/staywell-manager
-  newTag: latest
+  newTag: develop
 
 replicas:
 - name: staywell-frontend

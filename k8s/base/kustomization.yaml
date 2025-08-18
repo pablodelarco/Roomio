@@ -19,8 +19,3 @@ commonLabels:
 images:
 - name: ghcr.io/pablodelarco/staywell-manager
   newTag: latest
-
-
-
-
-  
