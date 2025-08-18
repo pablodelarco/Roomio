@@ -37,7 +37,6 @@ jobs:
     permissions:
       contents: write
       packages: write
-      security-events: write
       actions: read
     
     steps:
@@ -72,35 +71,52 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
     
-    - name: Security scan
+    - name: Security scan with Trivy
       uses: aquasecurity/trivy-action@master
       with:
         image-ref: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
-        format: 'sarif'
-        output: 'trivy-results.sarif'
+        format: 'table'
         exit-code: '0'
       continue-on-error: true
 
-    - name: Upload Trivy scan results
-      uses: github/codeql-action/upload-sarif@v3
-      if: always() && github.event_name != 'pull_request' && hashFiles('trivy-results.sarif') != ''
+    - name: Security scan summary (JSON)
+      uses: aquasecurity/trivy-action@master
       with:
-        sarif_file: 'trivy-results.sarif'
-        category: 'trivy'
+        image-ref: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
+        format: 'json'
+        output: 'trivy-results.json'
+        exit-code: '0'
       continue-on-error: true
 
-    - name: Display Trivy scan summary
+    - name: Display security scan summary
       if: always()
       run: |
         echo "=== Security Scan Summary ==="
-        echo "Scanned image: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}"
-        if [ -f trivy-results.sarif ]; then
+        echo "🔍 Scanned image: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}"
+
+        if [ -f trivy-results.json ]; then
           echo "✅ Security scan completed successfully"
-          echo "📄 Results saved to trivy-results.sarif"
-          # Extract and display summary if possible
+
+          # Parse and display vulnerability counts
           if command -v jq &> /dev/null; then
-            FINDINGS=$(jq '.runs[0].results | length' trivy-results.sarif 2>/dev/null || echo 'Unable to parse')
-            echo "🔍 Number of findings: $FINDINGS"
+            CRITICAL=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity=="CRITICAL")] | length' trivy-results.json 2>/dev/null || echo '0')
+            HIGH=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity=="HIGH")] | length' trivy-results.json 2>/dev/null || echo '0')
+            MEDIUM=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity=="MEDIUM")] | length' trivy-results.json 2>/dev/null || echo '0')
+            LOW=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity=="LOW")] | length' trivy-results.json 2>/dev/null || echo '0')
+
+            echo "📊 Vulnerability Summary:"
+            echo "   🔴 Critical: $CRITICAL"
+            echo "   🟠 High: $HIGH"
+            echo "   🟡 Medium: $MEDIUM"
+            echo "   🟢 Low: $LOW"
+
+            if [ "$CRITICAL" -gt 0 ] || [ "$HIGH" -gt 0 ]; then
+              echo "⚠️  High or Critical vulnerabilities found! Review the scan results above."
+            else
+              echo "✅ No Critical or High severity vulnerabilities found!"
+            fi
+          else
+            echo "📄 Scan completed - see detailed results above"
           fi
         else
           echo "❌ Security scan failed or results not found"
