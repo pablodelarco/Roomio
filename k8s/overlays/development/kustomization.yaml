@@ -15,8 +15,8 @@ commonLabels:
   environment: development
 
 images:
-- name: ghcr.io/pablodelarco/staywell-manager
-  newName: ghcr.io/pablodelarco/staywell-manager
+- name: ghcr.io/pablodelarco/staywell-manager-e301a7db
+  newName: ghcr.io/pablodelarco/staywell-manager-e301a7db
   newTag: develop
 
 replicas:
