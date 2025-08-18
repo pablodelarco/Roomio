@@ -2,6 +2,13 @@
 
 A modern property management SaaS application deployed on a homelab K3s cluster using GitOps.
 
+## 🚀 Status: GitOps Deployment Active
+
+- ✅ **ArgoCD**: Configured and syncing
+- ✅ **GitHub Actions**: CI/CD pipeline ready
+- ✅ **K3s Cluster**: 2-node homelab deployment
+- 🔄 **Building**: First container image...
+
 ## 🏗️ Architecture
 
 - **Frontend**: React + TypeScript + Vite
