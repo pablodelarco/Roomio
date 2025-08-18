@@ -98,7 +98,7 @@ echo "kubectl patch application staywell-dev -n argocd --type merge -p '{\"spec\
 echo ""
 echo "# Via ArgoCD UI:"
 echo "1. Open: http://192.168.1.238"
-echo "2. Login with admin / rWjEk-ZrQHAKWSro"
+echo "2. Login with admin / \$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d)"
 echo "3. Click on staywell-dev application"
 echo "4. Click 'Sync' button"
 echo ""
