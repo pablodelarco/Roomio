@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
+import { useAuth } from "@/contexts/AuthContext"
 
 export type Apartment = {
   id: string
@@ -8,6 +9,7 @@ export type Apartment = {
   total_rooms: number
   monthly_bills: number
   bills_paid_until: string | null
+  user_id: string
   created_at: string
   updated_at: string
 }
@@ -18,6 +20,7 @@ export type Room = {
   room_number: string
   monthly_rent: number
   is_occupied: boolean
+  user_id: string
   created_at: string
   updated_at: string
 }
@@ -34,6 +37,7 @@ export type Tenant = {
   deposit_amount: number | null
   deposit_paid: boolean
   deposit_returned: boolean
+  user_id: string
   created_at: string
   updated_at: string
 }
@@ -48,6 +52,7 @@ export type RentPayment = {
   utilities_paid: boolean
   payment_method: string | null
   notes: string | null
+  user_id: string
   created_at: string
   updated_at: string
 }
@@ -65,6 +70,7 @@ export type Bill = {
   is_paid: boolean
   utilities_paid: boolean
   paid_date: string | null
+  user_id: string
   created_at: string
   updated_at: string
 }
@@ -120,9 +126,7 @@ export function useTenants() {
         .order("first_name")
       
       if (error) throw error
-      return data as (Tenant & { 
-        rooms: Room & { apartment_id: string; apartments: Pick<Apartment, 'name' | 'address'> } 
-      })[]
+      return data as any[]
     },
   })
 }
@@ -147,20 +151,19 @@ export function useRentPayments() {
         .order("due_date", { ascending: false })
       
       if (error) throw error
-      return data as (RentPayment & {
-        tenants: Tenant & {
-          rooms: Room & { apartments: Pick<Apartment, 'name'> }
-        }
-      })[]
+      return data as any[]
     },
   })
 }
 
 export function useCreateApartment() {
   const queryClient = useQueryClient()
+  const { user } = useAuth()
   
   return useMutation({
     mutationFn: async (data: { name: string; address: string; total_rooms: number; monthly_bills: number; rooms: { room_number: string; monthly_rent: number }[] }) => {
+      if (!user) throw new Error('User must be authenticated')
+      
       // First create the apartment
       const { data: apartment, error: apartmentError } = await supabase
         .from('apartments')
@@ -168,7 +171,8 @@ export function useCreateApartment() {
           name: data.name,
           address: data.address,
           total_rooms: data.total_rooms,
-          monthly_bills: data.monthly_bills
+          monthly_bills: data.monthly_bills,
+          user_id: user.id
         })
         .select()
         .single()
@@ -179,7 +183,8 @@ export function useCreateApartment() {
       const roomsToInsert = data.rooms.map(room => ({
         apartment_id: apartment.id,
         room_number: room.room_number,
-        monthly_rent: room.monthly_rent
+        monthly_rent: room.monthly_rent,
+        user_id: user.id
       }))
 
       const { error: roomsError } = await supabase
@@ -199,12 +204,18 @@ export function useCreateApartment() {
 
 export function useCreateTenant() {
   const queryClient = useQueryClient()
+  const { user } = useAuth()
   
   return useMutation({
-    mutationFn: async (tenant: Omit<Tenant, 'id' | 'created_at' | 'updated_at'>) => {
+    mutationFn: async (tenant: Omit<Tenant, 'id' | 'created_at' | 'updated_at' | 'user_id'>) => {
+      if (!user) throw new Error('User must be authenticated')
+      
       const { data, error } = await supabase
         .from('tenants')
-        .insert(tenant)
+        .insert({
+          ...tenant,
+          user_id: user.id
+        })
         .select()
         .single()
       
@@ -281,6 +292,7 @@ export function useUpdateRentPayment() {
 
 export function useUpdateApartment() {
   const queryClient = useQueryClient()
+  const { user } = useAuth()
   
   return useMutation({
     mutationFn: async (data: { 
@@ -353,12 +365,14 @@ export function useUpdateApartment() {
           if (updateError) throw updateError
         } else {
           // Insert new room
+          if (!user) throw new Error('User must be authenticated')
           const { error: insertError } = await supabase
             .from('rooms')
             .insert({
               apartment_id: data.apartment.id,
               room_number: room.room_number,
-              monthly_rent: room.monthly_rent
+              monthly_rent: room.monthly_rent,
+              user_id: user.id
             })
           
           if (insertError) throw insertError
@@ -476,6 +490,7 @@ export function useUpdateBill() {
 
 export const useCreateBill = () => {
   const queryClient = useQueryClient()
+  const { user } = useAuth()
   
   return useMutation({
     mutationFn: async (billData: {
@@ -488,6 +503,8 @@ export const useCreateBill = () => {
       utilities_paid: boolean
       ready_to_pay: boolean
     }) => {
+      if (!user) throw new Error('User must be authenticated')
+      
       const { data, error } = await supabase
         .from('bills')
         .insert({
@@ -499,6 +516,7 @@ export const useCreateBill = () => {
           is_paid: billData.is_paid,
           utilities_paid: billData.utilities_paid,
           ready_to_pay: billData.ready_to_pay,
+          user_id: user.id
         })
         .select()
         .single()
