@@ -20,6 +20,7 @@ import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+// Updated 2025-01-20 to refresh deployment
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
