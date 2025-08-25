@@ -85,6 +85,11 @@ docker build -t staywell-manager .
 
 ## 📝 Environment Variables
 
+⚠️ **IMPORTANT**: Before deploying, you must replace the placeholder values in:
+- `k8s/base/secret.yaml` - Replace with your actual Supabase credentials
+- `nginx.conf` - Update CSP with your Supabase URL
+- `scripts/setup-argocd-auth.sh` - Update with your ArgoCD IP
+
 Create these secrets in Kubernetes:
 
 ```yaml
