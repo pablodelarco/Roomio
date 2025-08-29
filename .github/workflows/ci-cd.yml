@@ -58,7 +58,7 @@ jobs:
         tags: |
           type=ref,event=branch
           type=ref,event=pr
-          type=sha,prefix={{branch}}-
+          type=sha,prefix=sha-
           type=raw,value=latest,enable={{is_default_branch}}
         flavor: |
           latest=auto
@@ -127,10 +127,8 @@ jobs:
       run: |
         # Get the commit SHA for unique tagging
         COMMIT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-        BRANCH_NAME=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
-        IMAGE_TAG="${BRANCH_NAME}-${COMMIT_SHA}"
+        IMAGE_TAG="sha-${COMMIT_SHA}"
 
-        echo "Branch: $BRANCH_NAME"
         echo "Commit SHA: $COMMIT_SHA"
         echo "Updating image tag to: $IMAGE_TAG"
 
@@ -153,8 +151,7 @@ jobs:
           echo "No changes to commit"
         else
           COMMIT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          BRANCH_NAME=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
-          IMAGE_TAG="${BRANCH_NAME}-${COMMIT_SHA}"
+          IMAGE_TAG="sha-${COMMIT_SHA}"
           git commit -m "chore: update image tag to $IMAGE_TAG [skip ci]"
           git push
         fi
@@ -185,4 +182,3 @@ jobs:
         echo "📦 Image: ghcr.io/pablodelarco/staywell-manager-e301a7db:latest"
         echo "🎯 Namespace: staywell-manager-dev (using same namespace for now)"
         echo "🔄 ArgoCD will automatically sync the changes within 3 minutes"
-        echo "🌐 Access: http://192.168.1.106:30080"
