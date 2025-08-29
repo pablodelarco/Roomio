@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/pablodelarco/staywell-manager-e301a7db.git
     targetRevision: develop
-    path: k8s/overlays/development
+    path: k8s
   destination:
     server: https://kubernetes.default.svc
     namespace: staywell-manager-dev

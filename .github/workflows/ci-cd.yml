@@ -129,13 +129,18 @@ jobs:
         IMAGE_TAG=$(echo '${{ steps.meta.outputs.tags }}' | head -n1 | cut -d':' -f2)
         echo "Updating image tag to: $IMAGE_TAG"
 
-        # Update simple deployment manifest
+        # Update deployment manifests based on branch
         if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+          echo "Updating development deployment..."
+          sed -i "s|image: ghcr.io/pablodelarco/staywell-manager-e301a7db:.*|image: ghcr.io/pablodelarco/staywell-manager-e301a7db:$IMAGE_TAG|" k8s/simple-deployment.yaml
+        elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          echo "Updating production deployment..."
+          # For main branch, we'll update with the latest tag
           sed -i "s|image: ghcr.io/pablodelarco/staywell-manager-e301a7db:.*|image: ghcr.io/pablodelarco/staywell-manager-e301a7db:$IMAGE_TAG|" k8s/simple-deployment.yaml
         fi
 
     - name: Commit and push updated manifests
-      if: github.ref == 'refs/heads/develop'
+      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
@@ -143,7 +148,8 @@ jobs:
         if git diff --staged --quiet; then
           echo "No changes to commit"
         else
-          git commit -m "chore: update image tag to $(echo '${{ steps.meta.outputs.tags }}' | head -n1 | cut -d':' -f2) [skip ci]"
+          BRANCH_NAME=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
+          git commit -m "chore: update image tag to $(echo '${{ steps.meta.outputs.tags }}' | head -n1 | cut -d':' -f2) for $BRANCH_NAME [skip ci]"
           git push
         fi
 
@@ -151,20 +157,26 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop'
-    
+
     steps:
-    - name: Trigger ArgoCD Sync (Development)
+    - name: Development Deployment Summary
       run: |
         echo "🚀 Development deployment triggered"
-        echo "ArgoCD will automatically sync the changes"
-        
+        echo "📦 Image: ghcr.io/pablodelarco/staywell-manager-e301a7db:develop"
+        echo "🎯 Namespace: staywell-manager-dev"
+        echo "🔄 ArgoCD will automatically sync the changes within 3 minutes"
+        echo "🌐 Access: http://192.168.1.106:30080"
+
   deploy-prod:
     needs: build-and-push
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
-    - name: Trigger ArgoCD Sync (Production)
+    - name: Production Deployment Summary
       run: |
         echo "🚀 Production deployment triggered"
-        echo "ArgoCD will automatically sync the changes"
+        echo "📦 Image: ghcr.io/pablodelarco/staywell-manager-e301a7db:latest"
+        echo "🎯 Namespace: staywell-manager-dev (using same namespace for now)"
+        echo "🔄 ArgoCD will automatically sync the changes within 3 minutes"
+        echo "🌐 Access: http://192.168.1.106:30080"
