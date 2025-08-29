@@ -1,61 +1,58 @@
-# 🏠 StayWell Manager - Homelab SaaS
+# StayWell Manager – Homelab SaaS Platform
 
-A modern property management SaaS application deployed on a homelab K3s cluster using GitOps.
+**StayWell Manager** is a modern property management SaaS deployed on a self-hosted K3s cluster with a complete GitOps-powered CI/CD pipeline. Built as a side project to demonstrate scalable, automated deployments using cloud-native best practices.
 
-## 🚀 Status: GitOps Deployment Active
+---
 
-- ✅ **ArgoCD**: Configured and syncing
-- ✅ **GitHub Actions**: CI/CD pipeline ready
-- ✅ **K3s Cluster**: 2-node homelab deployment
-- 🔄 **Building**: First container image...
+##  Architecture & Tech Stack
 
-## 🏗️ Architecture
+- **Frontend:** React + TypeScript + Vite  
+- **Backend:** Supabase (Database + Authentication)  
+- **Containerization:** Docker with nginx (non-root user)  
+- **Kubernetes Orchestration:** K3s  
+- **GitOps:** ArgoCD  
+- **CI/CD:** GitHub Actions (test → build → scan → deploy)  
+- **Registry:** GitHub Container Registry (GHCR)  
+- **Security:** Trivy container scanning in CI  
+- **Networking & Ingress:** Traefik, Tailscale for remote access, Cert-Manager for SSL  
+- **Infrastructure:** 2-node homelab cluster (beelink + worker); GitOps overlays for `development` and `production`
 
-- **Frontend**: React + TypeScript + Vite
-- **Backend**: Supabase (Database + Auth)
-- **Container**: Docker with nginx
-- **Orchestration**: Kubernetes (K3s)
-- **GitOps**: ArgoCD
-- **CI/CD**: GitHub Actions
-- **Registry**: GitHub Container Registry (GHCR)
+---
 
-## 🚀 Deployment
+##  CI/CD Workflow
 
-### Automatic Deployment (GitOps)
+1. **Push to `develop` branch** → Pipeline runs, builds container images, runs security scans, updates dev overlay → ArgoCD syncs to the development environment.  
+2. **Push to `main` branch** → Same pipeline, followed by ArgoCD deployment to production cluster.  
+3. **GitOps at the core**: Ensures deployments remain transparent, auditable, and easily revertible.
 
-1. **Push to `develop` branch** → Deploys to development environment
-2. **Push to `main` branch** → Deploys to production environment
-3. **ArgoCD** automatically syncs changes to the K3s cluster
+---
 
-### Manual Deployment
+##  Why It Matters
+
+- Demonstrates hands-on experience with **end-to-end DevOps and GitOps workflows**—from local development to production-grade orchestration.  
+- Transparent, Git-based deployment ensures **traceability and reproducibility**.  
+- Security is integrated early through **automated container scanning with Trivy**.  
+- Fully autonomous delivery pipeline—ideal for continuous iteration and fast-feature delivery in SaaS.
+
+---
+
+##  Setup & Development
 
 ```bash
-# Deploy to development
-kubectl apply -k k8s/overlays/development
-
-# Deploy to production
-kubectl apply -k k8s/overlays/production
-```
-
-## 🔧 Development
-
-```bash
-# Install dependencies
+# Local development:
 npm install
-
-# Start development server
 npm run dev
 
-# Build for production
-npm run build:prod
-
-# Run tests
+# Test suite:
 npm test
 
-# Build container
-docker build -t staywell-manager .
-```
+# Production build:
+npm run build:prod
 
+# Build container locally:
+docker build -t staywell-manager .
+
+<<<<<<< HEAD
 ## 🌐 Access
 
 - **Development**: http://dev.staywell.local
@@ -109,3 +106,8 @@ data:
 - [ ] Add backup strategy
 - [ ] Implement blue-green deployments
 - [ ] Set up alerting
+=======
+# GitOps manual triggers:
+kubectl apply -k k8s/overlays/development
+kubectl apply -k k8s/overlays/production
+>>>>>>> origin/main

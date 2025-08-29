@@ -24,6 +24,7 @@ export type Database = {
           name: string
           total_rooms: number
           updated_at: string
+          user_id: string
         }
         Insert: {
           address: string
@@ -34,6 +35,7 @@ export type Database = {
           name: string
           total_rooms?: number
           updated_at?: string
+          user_id: string
         }
         Update: {
           address?: string
@@ -44,6 +46,7 @@ export type Database = {
           name?: string
           total_rooms?: number
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -62,6 +65,7 @@ export type Database = {
           provider: string
           ready_to_pay: boolean | null
           updated_at: string
+          user_id: string
           utilities_paid: boolean | null
         }
         Insert: {
@@ -78,6 +82,7 @@ export type Database = {
           provider: string
           ready_to_pay?: boolean | null
           updated_at?: string
+          user_id: string
           utilities_paid?: boolean | null
         }
         Update: {
@@ -94,6 +99,7 @@ export type Database = {
           provider?: string
           ready_to_pay?: boolean | null
           updated_at?: string
+          user_id?: string
           utilities_paid?: boolean | null
         }
         Relationships: [
@@ -118,6 +124,7 @@ export type Database = {
           payment_method: string | null
           tenant_id: string
           updated_at: string
+          user_id: string
           utilities_paid: boolean | null
         }
         Insert: {
@@ -131,6 +138,7 @@ export type Database = {
           payment_method?: string | null
           tenant_id: string
           updated_at?: string
+          user_id: string
           utilities_paid?: boolean | null
         }
         Update: {
@@ -144,6 +152,7 @@ export type Database = {
           payment_method?: string | null
           tenant_id?: string
           updated_at?: string
+          user_id?: string
           utilities_paid?: boolean | null
         }
         Relationships: [
@@ -165,6 +174,7 @@ export type Database = {
           monthly_rent: number
           room_number: string
           updated_at: string
+          user_id: string
         }
         Insert: {
           apartment_id: string
@@ -174,6 +184,7 @@ export type Database = {
           monthly_rent: number
           room_number: string
           updated_at?: string
+          user_id: string
         }
         Update: {
           apartment_id?: string
@@ -183,6 +194,7 @@ export type Database = {
           monthly_rent?: number
           room_number?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -209,6 +221,7 @@ export type Database = {
           phone: string | null
           room_id: string
           updated_at: string
+          user_id: string
         }
         Insert: {
           created_at?: string
@@ -224,6 +237,7 @@ export type Database = {
           phone?: string | null
           room_id: string
           updated_at?: string
+          user_id: string
         }
         Update: {
           created_at?: string
@@ -239,6 +253,7 @@ export type Database = {
           phone?: string | null
           room_id?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
