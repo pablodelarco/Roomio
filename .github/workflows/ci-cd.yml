@@ -129,22 +129,17 @@ jobs:
         IMAGE_TAG=$(echo '${{ steps.meta.outputs.tags }}' | head -n1 | cut -d':' -f2)
         echo "Updating image tag to: $IMAGE_TAG"
 
-        # Update development overlay
+        # Update simple deployment manifest
         if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
-          sed -i "s|newTag: .*|newTag: $IMAGE_TAG|" k8s/overlays/development/kustomization.yaml
-        fi
-
-        # Update production overlay
-        if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-          sed -i "s|newTag: .*|newTag: $IMAGE_TAG|" k8s/overlays/production/kustomization.yaml
+          sed -i "s|image: ghcr.io/pablodelarco/staywell-manager-e301a7db:.*|image: ghcr.io/pablodelarco/staywell-manager-e301a7db:$IMAGE_TAG|" k8s/simple-deployment.yaml
         fi
 
     - name: Commit and push updated manifests
-      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/develop'
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add k8s/overlays/*/kustomization.yaml
+        git add k8s/simple-deployment.yaml
         if git diff --staged --quiet; then
           echo "No changes to commit"
         else
