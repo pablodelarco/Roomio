@@ -94,6 +94,9 @@ export function PaymentStatusPopover({
             paid_date: checked ? new Date().toISOString().split('T')[0] : null
           })
           
+          const { data: { user } } = await supabase.auth.getUser()
+          if (!user) throw new Error('Not authenticated')
+          
           const { error } = await supabase
             .from('rent_payments')
             .insert({
@@ -102,7 +105,8 @@ export function PaymentStatusPopover({
               due_date: dueDate,
               is_paid: checked,
               paid_date: checked ? new Date().toISOString().split('T')[0] : null,
-              utilities_paid: localUtilitiesPaid
+              utilities_paid: localUtilitiesPaid,
+              user_id: user.id
             })
             
           if (error) throw error
@@ -197,6 +201,9 @@ export function PaymentStatusPopover({
             paid_date: localRentPaid ? new Date().toISOString().split('T')[0] : null
           })
           
+          const { data: { user } } = await supabase.auth.getUser()
+          if (!user) throw new Error('Not authenticated')
+          
           const { error } = await supabase
             .from('rent_payments')
             .insert({
@@ -205,7 +212,8 @@ export function PaymentStatusPopover({
               due_date: dueDate,
               is_paid: localRentPaid,
               utilities_paid: checked,
-              paid_date: localRentPaid ? new Date().toISOString().split('T')[0] : null
+              paid_date: localRentPaid ? new Date().toISOString().split('T')[0] : null,
+              user_id: user.id
             })
             
           if (error) throw error
