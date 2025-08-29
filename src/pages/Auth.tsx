@@ -93,7 +93,7 @@ export default function Auth() {
     setError(null);
 
     try {
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = 'http://192.168.1.106:30080/';
       console.log('=== GOOGLE OAUTH DEBUG ===');
       console.log('Current window.location.origin:', window.location.origin);
       console.log('Current window.location.href:', window.location.href);

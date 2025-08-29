@@ -15,11 +15,34 @@ spec:
       labels:
         app: staywell-frontend
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: beelink
       containers:
       - name: frontend
         image: ghcr.io/pablodelarco/staywell-manager-e301a7db:develop
         ports:
         - containerPort: 8080
+        env:
+        - name: VITE_SUPABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: dev-staywell-secrets
+              key: supabase-url
+        - name: VITE_SUPABASE_ANON_KEY
+          valueFrom:
+            secretKeyRef:
+              name: dev-staywell-secrets
+              key: supabase-anon-key
+        - name: VITE_STRIPE_PUBLISHABLE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: dev-staywell-secrets
+              key: stripe-publishable-key
+        - name: VITE_SENTRY_DSN
+          valueFrom:
+            secretKeyRef:
+              name: dev-staywell-secrets
+              key: sentry-dsn
         resources:
           requests:
             memory: "64Mi"
