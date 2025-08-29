@@ -91,6 +91,9 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
         // Create new payment record using supabase client
         const { supabase } = await import("@/integrations/supabase/client")
         
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) throw new Error('Not authenticated')
+        
         await supabase
           .from('rent_payments')
           .insert({
@@ -98,7 +101,8 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
             amount: tenant.rooms.monthly_rent,
             due_date: dueDate,
             is_paid: isPaid,
-            paid_date: isPaid ? new Date().toISOString().split('T')[0] : null
+            paid_date: isPaid ? new Date().toISOString().split('T')[0] : null,
+            user_id: user.id
           })
       }
       
@@ -135,6 +139,9 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
         const currentMonth = currentDate.toISOString().slice(0, 7) // YYYY-MM format
         const dueDate = `${currentMonth}-01` // First day of current month
         
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) throw new Error('Not authenticated')
+        
         await supabase
           .from('rent_payments')
           .insert({
@@ -142,7 +149,8 @@ export function EditTenantDialog({ tenant, children, showPaymentStatus = false }
             amount: tenant.rooms.monthly_rent,
             due_date: dueDate,
             is_paid: false,
-            utilities_paid: isPaid
+            utilities_paid: isPaid,
+            user_id: user.id
           })
       }
       
