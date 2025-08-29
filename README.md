@@ -437,6 +437,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**🚀 Built by [Pablo del Arco](https://pablodelarco.com)**
+**Built with ❤️ by [Pablo de Larco](https://pablodelarco.com)**
 
 *Showcasing enterprise-grade DevOps engineering and cloud-native architecture expertise.*
