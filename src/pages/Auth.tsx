@@ -93,12 +93,18 @@ export default function Auth() {
     setError(null);
 
     try {
-      console.log('Attempting Google sign in with redirect URL:', `${window.location.origin}/`);
-      
+      const redirectUrl = `${window.location.origin}/`;
+      console.log('=== GOOGLE OAUTH DEBUG ===');
+      console.log('Current window.location.origin:', window.location.origin);
+      console.log('Current window.location.href:', window.location.href);
+      console.log('Redirect URL being sent to Supabase:', redirectUrl);
+      console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
+      console.log('========================');
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',

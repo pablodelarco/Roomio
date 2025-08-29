@@ -25,9 +25,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('=== AUTH CONTEXT INIT ===');
+    console.log('Current URL:', window.location.href);
+    console.log('Current origin:', window.location.origin);
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log('=== AUTH STATE CHANGE ===');
+        console.log('Event:', event);
+        console.log('Session:', session);
+        console.log('Current URL:', window.location.href);
+        console.log('========================');
+
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -36,6 +46,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('=== INITIAL SESSION CHECK ===');
+      console.log('Session:', session);
+      console.log('Current URL:', window.location.href);
+      console.log('=============================');
+
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
