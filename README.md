@@ -111,3 +111,4 @@ data:
 kubectl apply -k k8s/overlays/development
 kubectl apply -k k8s/overlays/production
 >>>>>>> origin/main
+# GitOps Test - Fri Aug 29 12:06:25 PM CEST 2025
