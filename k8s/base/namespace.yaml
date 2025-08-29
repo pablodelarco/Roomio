@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: staywell-manager
-  labels:
-    app.kubernetes.io/name: staywell-manager
-    app.kubernetes.io/component: namespace
-    app.kubernetes.io/part-of: staywell-platform

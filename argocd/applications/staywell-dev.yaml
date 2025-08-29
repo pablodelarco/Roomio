@@ -1,14 +1,15 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: staywell-dev
+  name: staywell-manager-dev
   namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
+  labels:
+    app: staywell-manager
+    environment: development
 spec:
   project: default
   source:
-    repoURL: https://github.com/pablodelarco/staywell-manager-e301a7db.git
+    repoURL: https://github.com/pablodelarco/staywell-manager-e301a7db-1
     targetRevision: develop
     path: k8s
   destination:
@@ -18,11 +19,15 @@ spec:
     automated:
       prune: true
       selfHeal: true
+      allowEmpty: false
     syncOptions:
     - CreateNamespace=true
+    - PrunePropagationPolicy=foreground
+    - PruneLast=true
     retry:
       limit: 5
       backoff:
         duration: 5s
         factor: 2
         maxDuration: 3m
+  revisionHistoryLimit: 10
