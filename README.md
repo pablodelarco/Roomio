@@ -318,6 +318,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Built with ❤️ by [Pablo de Larco](https://pablodelarco.com)**
+**Built with ❤️ by [Pablo del Arco](https://pablodelarco.com)**
 
 *Demonstrating modern cloud-native development with enterprise-grade DevOps practices.*
