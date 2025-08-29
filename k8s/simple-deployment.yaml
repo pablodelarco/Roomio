@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: ghcr.io/pablodelarco/staywell-manager-e301a7db:latest
+        image: ghcr.io/pablodelarco/staywell-manager-e301a7db:develop
         ports:
         - containerPort: 8080
         resources:
