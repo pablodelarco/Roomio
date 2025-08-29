@@ -58,7 +58,7 @@ jobs:
         tags: |
           type=ref,event=branch
           type=ref,event=pr
-          type=sha
+          type=sha,prefix={{branch}}-
           type=raw,value=latest,enable={{is_default_branch}}
         flavor: |
           latest=auto
@@ -125,8 +125,13 @@ jobs:
 
     - name: Update image tags in manifests
       run: |
-        # Extract the first tag from the metadata output
-        IMAGE_TAG=$(echo '${{ steps.meta.outputs.tags }}' | head -n1 | cut -d':' -f2)
+        # Get the commit SHA for unique tagging
+        COMMIT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+        BRANCH_NAME=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
+        IMAGE_TAG="${BRANCH_NAME}-${COMMIT_SHA}"
+
+        echo "Branch: $BRANCH_NAME"
+        echo "Commit SHA: $COMMIT_SHA"
         echo "Updating image tag to: $IMAGE_TAG"
 
         # Update deployment manifests based on branch
@@ -135,7 +140,6 @@ jobs:
           sed -i "s|image: ghcr.io/pablodelarco/staywell-manager-e301a7db:.*|image: ghcr.io/pablodelarco/staywell-manager-e301a7db:$IMAGE_TAG|" k8s/simple-deployment.yaml
         elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
           echo "Updating production deployment..."
-          # For main branch, we'll update with the latest tag
           sed -i "s|image: ghcr.io/pablodelarco/staywell-manager-e301a7db:.*|image: ghcr.io/pablodelarco/staywell-manager-e301a7db:$IMAGE_TAG|" k8s/simple-deployment.yaml
         fi
 
@@ -148,8 +152,10 @@ jobs:
         if git diff --staged --quiet; then
           echo "No changes to commit"
         else
+          COMMIT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
           BRANCH_NAME=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
-          git commit -m "chore: update image tag to $(echo '${{ steps.meta.outputs.tags }}' | head -n1 | cut -d':' -f2) for $BRANCH_NAME [skip ci]"
+          IMAGE_TAG="${BRANCH_NAME}-${COMMIT_SHA}"
+          git commit -m "chore: update image tag to $IMAGE_TAG [skip ci]"
           git push
         fi
 
