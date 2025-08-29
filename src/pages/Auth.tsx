@@ -19,6 +19,14 @@ export default function Auth() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  // Force dark mode for auth page
+  useEffect(() => {
+    document.documentElement.classList.add('dark');
+    return () => {
+      document.documentElement.classList.remove('dark');
+    };
+  }, []);
+
   // Redirect if already authenticated
   useEffect(() => {
     if (user) {
