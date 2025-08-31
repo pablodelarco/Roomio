@@ -1,0 +1,111 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cert-monitoring-script
+  labels:
+    app.kubernetes.io/name: cert-monitoring
+    app.kubernetes.io/part-of: staywell-manager
+data:
+  check-certs.sh: |
+    #!/bin/bash
+    # Certificate monitoring script
+    
+    echo "=== Certificate Status Check ==="
+    echo "Timestamp: $(date)"
+    echo
+    
+    # Check all certificates in all namespaces
+    echo "📋 All Certificates:"
+    kubectl get certificates -A -o custom-columns="NAMESPACE:.metadata.namespace,NAME:.metadata.name,READY:.status.conditions[?(@.type=='Ready')].status,AGE:.metadata.creationTimestamp"
+    echo
+    
+    # Check certificate details
+    echo "🔍 Certificate Details:"
+    for ns in $(kubectl get certificates -A -o jsonpath='{.items[*].metadata.namespace}' | tr ' ' '\n' | sort -u); do
+      for cert in $(kubectl get certificates -n $ns -o jsonpath='{.items[*].metadata.name}'); do
+        echo "--- Certificate: $ns/$cert ---"
+        kubectl describe certificate $cert -n $ns | grep -E "(Status|Not After|DNS Names|Events)" -A 5
+        echo
+      done
+    done
+    
+    # Check cluster issuers
+    echo "🏭 Cluster Issuers:"
+    kubectl get clusterissuers -o custom-columns="NAME:.metadata.name,READY:.status.conditions[?(@.type=='Ready')].status,AGE:.metadata.creationTimestamp"
+    echo
+    
+    # Check for failed challenges
+    echo "⚠️  Failed Challenges:"
+    kubectl get challenges -A -o custom-columns="NAMESPACE:.metadata.namespace,NAME:.metadata.name,STATE:.status.state,DOMAIN:.spec.dnsName,AGE:.metadata.creationTimestamp" | grep -v "valid" || echo "No failed challenges found"
+    echo
+    
+    echo "=== End Certificate Check ==="
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cert-monitoring
+  labels:
+    app.kubernetes.io/name: cert-monitoring
+    app.kubernetes.io/part-of: staywell-manager
+spec:
+  schedule: "0 */6 * * *"  # Every 6 hours
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: cert-monitoring
+          containers:
+          - name: cert-checker
+            image: bitnami/kubectl:latest
+            command:
+            - /bin/bash
+            - /scripts/check-certs.sh
+            volumeMounts:
+            - name: script
+              mountPath: /scripts
+          volumes:
+          - name: script
+            configMap:
+              name: cert-monitoring-script
+              defaultMode: 0755
+          restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cert-monitoring
+  labels:
+    app.kubernetes.io/name: cert-monitoring
+    app.kubernetes.io/part-of: staywell-manager
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cert-monitoring
+  labels:
+    app.kubernetes.io/name: cert-monitoring
+    app.kubernetes.io/part-of: staywell-manager
+rules:
+- apiGroups: ["cert-manager.io"]
+  resources: ["certificates", "clusterissuers", "challenges"]
+  verbs: ["get", "list", "describe"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cert-monitoring
+  labels:
+    app.kubernetes.io/name: cert-monitoring
+    app.kubernetes.io/part-of: staywell-manager
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cert-monitoring
+subjects:
+- kind: ServiceAccount
+  name: cert-monitoring
+  namespace: default

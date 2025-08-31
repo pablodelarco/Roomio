@@ -23,6 +23,7 @@ patchesStrategicMerge:
 - deployment-patch.yaml
 - service-patch.yaml
 - ingress-patch.yaml
+- certificate-patch.yaml
 
 replicas:
 - name: staywell-frontend

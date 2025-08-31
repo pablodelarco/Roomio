@@ -3,8 +3,16 @@ kind: Ingress
 metadata:
   name: staywell-ingress
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/redirect-entry-point: websecure
+    traefik.ingress.kubernetes.io/redirect-permanent: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-staging  # Use staging for dev
 spec:
+  tls:
+  - hosts:
+    - dev.pablodelarco.com
+    secretName: dev-staywell-tls-secret
   rules:
   - host: dev.pablodelarco.com
     http:

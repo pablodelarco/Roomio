@@ -1,0 +1,57 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: staywell-network-policy
+  labels:
+    app.kubernetes.io/name: staywell-network-policy
+    app.kubernetes.io/part-of: staywell-manager
+spec:
+  podSelector:
+    matchLabels:
+      app: staywell-frontend
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system  # Allow Traefik ingress
+    ports:
+    - protocol: TCP
+      port: 8080
+  - from: []  # Allow all ingress traffic (for public web app)
+    ports:
+    - protocol: TCP
+      port: 8080
+  egress:
+  - to: []  # Allow all egress (for API calls, DNS, etc.)
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: staywell-security-headers
+  labels:
+    app.kubernetes.io/name: staywell-security-headers
+    app.kubernetes.io/part-of: staywell-manager
+type: Opaque
+stringData:
+  security-headers.yaml: |
+    http:
+      middlewares:
+        security-headers:
+          headers:
+            customRequestHeaders:
+              X-Forwarded-Proto: "https"
+            customResponseHeaders:
+              X-Frame-Options: "SAMEORIGIN"
+              X-Content-Type-Options: "nosniff"
+              X-XSS-Protection: "1; mode=block"
+              Referrer-Policy: "strict-origin-when-cross-origin"
+              Strict-Transport-Security: "max-age=31536000; includeSubDomains; preload"
+              Content-Security-Policy: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://tddfubdbrmcteclrpnfv.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://tddfubdbrmcteclrpnfv.supabase.co wss://tddfubdbrmcteclrpnfv.supabase.co;"
+        rate-limit:
+          rateLimit:
+            average: 100
+            burst: 200
+            period: 1m
