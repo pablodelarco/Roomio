@@ -4,20 +4,9 @@ metadata:
   name: staywell-ingress
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web
-    traefik.ingress.kubernetes.io/router.rule: Host(`dev.pablodelarco.com`) || Host(`localhost`)
 spec:
   rules:
   - host: dev.pablodelarco.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: dev-staywell-frontend-service
-            port:
-              number: 80
-  - host: localhost  # For local development
     http:
       paths:
       - path: /

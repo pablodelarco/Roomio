@@ -3,10 +3,9 @@ kind: Service
 metadata:
   name: staywell-frontend-service
 spec:
-  type: NodePort  # Keep NodePort for development access
+  type: ClusterIP  # Use ClusterIP for ingress compatibility
   ports:
   - port: 80
     targetPort: 8080
-    nodePort: 30080
     protocol: TCP
     name: http
