@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, staging ]
   pull_request:
     branches: [ main ]
 
@@ -136,13 +136,16 @@ jobs:
         if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
           echo "Updating development deployment..."
           sed -i "s|newTag: .*|newTag: $IMAGE_TAG|" k8s/overlays/development/kustomization.yaml
+        elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+          echo "Updating staging deployment..."
+          sed -i "s|newTag: .*|newTag: $IMAGE_TAG|" k8s/overlays/staging/kustomization.yaml
         elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
           echo "Updating production deployment..."
           sed -i "s|newTag: .*|newTag: $IMAGE_TAG|" k8s/overlays/production/kustomization.yaml
         fi
 
     - name: Commit and push updated manifests
-      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main'
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
@@ -150,6 +153,8 @@ jobs:
         # Add the appropriate overlay file based on branch
         if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
           git add k8s/overlays/development/kustomization.yaml
+        elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+          git add k8s/overlays/staging/kustomization.yaml
         elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
           git add k8s/overlays/production/kustomization.yaml
         fi
@@ -176,6 +181,20 @@ jobs:
         echo "🎯 Namespace: staywell-manager-dev"
         echo "🔄 ArgoCD will automatically sync the changes within 3 minutes"
         echo "🌐 Access: http://192.168.1.106:30080"
+
+  deploy-staging:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/staging'
+
+    steps:
+    - name: Staging Deployment Summary
+      run: |
+        echo "🚀 Staging deployment triggered"
+        echo "📦 Image: ghcr.io/pablodelarco/staywell-manager-e301a7db:staging"
+        echo "🎯 Namespace: staywell-manager-staging"
+        echo "🔄 ArgoCD will automatically sync the changes within 3 minutes"
+        echo "🌐 Access: http://staging.pablodelarco.com"
 
   deploy-prod:
     needs: build-and-push
