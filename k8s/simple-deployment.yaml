@@ -20,7 +20,7 @@ spec:
         kubernetes.io/hostname: beelink
       containers:
       - name: frontend
-        image: ghcr.io/pablodelarco/staywell-manager-e301a7db:sha-4d06c4f
+        image: ghcr.io/pablodelarco/staywell-manager-e301a7db:sha-f566148
         ports:
         - containerPort: 8080
         resources:
