@@ -132,13 +132,13 @@ jobs:
         echo "Commit SHA: $COMMIT_SHA"
         echo "Updating image tag to: $IMAGE_TAG"
 
-        # Update deployment manifests based on branch
+        # Update Kustomize overlays based on branch
         if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
           echo "Updating development deployment..."
-          sed -i "s|image: ghcr.io/pablodelarco/staywell-manager-e301a7db:.*|image: ghcr.io/pablodelarco/staywell-manager-e301a7db:$IMAGE_TAG|" k8s/simple-deployment.yaml
+          sed -i "s|newTag: .*|newTag: $IMAGE_TAG|" k8s/overlays/development/kustomization.yaml
         elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
           echo "Updating production deployment..."
-          sed -i "s|image: ghcr.io/pablodelarco/staywell-manager-e301a7db:.*|image: ghcr.io/pablodelarco/staywell-manager-e301a7db:$IMAGE_TAG|" k8s/simple-deployment.yaml
+          sed -i "s|newTag: .*|newTag: $IMAGE_TAG|" k8s/overlays/production/kustomization.yaml
         fi
 
     - name: Commit and push updated manifests
@@ -146,7 +146,14 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add k8s/simple-deployment.yaml
+
+        # Add the appropriate overlay file based on branch
+        if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+          git add k8s/overlays/development/kustomization.yaml
+        elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          git add k8s/overlays/production/kustomization.yaml
+        fi
+
         if git diff --staged --quiet; then
           echo "No changes to commit"
         else

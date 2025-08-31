@@ -3,9 +3,7 @@ kind: Ingress
 metadata:
   name: staywell-ingress
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-    traefik.ingress.kubernetes.io/router.tls: "true"
-    traefik.ingress.kubernetes.io/router.middlewares: default-redirect-https@kubernetescrd
+    traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
   rules:
   - host: pablodelarco.com
@@ -18,7 +16,3 @@ spec:
             name: prod-staywell-frontend-service
             port:
               number: 80
-  tls:
-  - hosts:
-    - pablodelarco.com
-    secretName: pablodelarco-tls
