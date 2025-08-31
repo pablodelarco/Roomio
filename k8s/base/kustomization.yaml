@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: staywell-manager-base
+
+resources:
+- namespace.yaml
+- deployment.yaml
+- service.yaml
+- ingress.yaml
+
+commonLabels:
+  app.kubernetes.io/part-of: staywell-manager
+  app.kubernetes.io/managed-by: kustomize
+
+images:
+- name: ghcr.io/pablodelarco/staywell-manager-e301a7db
+  newTag: latest

@@ -1,14 +1,16 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: pablodelarco-ingress
-  namespace: staywell-manager-dev
+  name: staywell-ingress
+  labels:
+    app.kubernetes.io/name: staywell-ingress
+    app.kubernetes.io/part-of: staywell-manager
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
   ingressClassName: traefik
   rules:
-  - host: pablodelarco.com
+  - host: pablodelarco.com  # Will be overridden by overlays
     http:
       paths:
       - path: /

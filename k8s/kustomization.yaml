@@ -1,8 +1,11 @@
+# This file is deprecated - use overlays instead
+# For development: kubectl apply -k k8s/overlays/development
+# For staging:     kubectl apply -k k8s/overlays/staging
+# For production:  kubectl apply -k k8s/overlays/production
+
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+# Default to development overlay for backward compatibility
 resources:
-- simple-namespace.yaml
-- simple-deployment.yaml
-- simple-service.yaml
-- pablodelarco-ingress.yaml
+- overlays/development
