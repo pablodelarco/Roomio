@@ -3,17 +3,10 @@ kind: Ingress
 metadata:
   name: staywell-ingress
   annotations:
-    # TLS and security configuration
-    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-    traefik.ingress.kubernetes.io/router.tls: "true"
-    traefik.ingress.kubernetes.io/redirect-entry-point: websecure
-    traefik.ingress.kubernetes.io/redirect-permanent: "true"
+    # Basic TLS configuration
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    # Security middleware
-    traefik.ingress.kubernetes.io/router.middlewares: staywell-manager-prod-security-headers@kubernetescrd,staywell-manager-prod-rate-limit@kubernetescrd
-    # Modern TLS configuration
-    traefik.ingress.kubernetes.io/router.tls.options: modern@file
 spec:
+  ingressClassName: traefik
   tls:
   - hosts:
     - pablodelarco.com
