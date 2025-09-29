@@ -143,9 +143,9 @@ export default function Auth() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Property Manager</CardTitle>
+          <CardTitle className="text-2xl font-bold">Roomio</CardTitle>
           <CardDescription>
-            Sign in to access your property management dashboard
+            Sign in to manage your apartments and tenants
           </CardDescription>
         </CardHeader>
         <CardContent>

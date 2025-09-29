@@ -51,8 +51,8 @@ export function AppSidebar() {
               <Building2 className="h-4 w-4 text-sidebar-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-sidebar-foreground">StayWell</h1>
-              <p className="text-xs text-sidebar-foreground/60">Property Manager</p>
+              <h1 className="text-lg font-semibold text-sidebar-foreground">Roomio</h1>
+              <p className="text-xs text-sidebar-foreground/60">Apartment Manager</p>
             </div>
           </div>
         </div>
