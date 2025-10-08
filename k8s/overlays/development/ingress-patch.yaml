@@ -2,17 +2,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: roomio-ingress
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-    traefik.ingress.kubernetes.io/router.tls: "true"
-    traefik.ingress.kubernetes.io/redirect-entry-point: websecure
-    traefik.ingress.kubernetes.io/redirect-permanent: "true"
-    cert-manager.io/cluster-issuer: letsencrypt-staging  # Use staging for dev
 spec:
-  tls:
-  - hosts:
-    - dev.roomiorentals.com
-    secretName: dev-roomio-tls-secret
+  ingressClassName: traefik
   rules:
   - host: dev.roomiorentals.com
     http:
