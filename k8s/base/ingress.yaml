@@ -5,16 +5,8 @@ metadata:
   labels:
     app.kubernetes.io/name: roomio-ingress
     app.kubernetes.io/part-of: roomio
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-    traefik.ingress.kubernetes.io/router.tls: "true"
-    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: traefik
-  tls:
-  - hosts:
-    - roomiorentals.com  # Will be overridden by overlays
-    secretName: roomio-tls-secret
   rules:
   - host: roomiorentals.com  # Will be overridden by overlays
     http:
