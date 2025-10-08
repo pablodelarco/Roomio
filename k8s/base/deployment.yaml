@@ -30,7 +30,7 @@ spec:
         effect: NoSchedule
       containers:
       - name: frontend
-        image: ghcr.io/pablodelarco/staywell-manager-e301a7db:latest  # Will be overridden
+        image: ghcr.io/pablodelarco/roomio:latest  # Will be overridden
         ports:
         - containerPort: 8080
           name: http
