@@ -123,7 +123,48 @@ jobs:
           echo "This may be due to image availability issues or scan errors"
         fi
 
-    - name: Update image tags in manifests
+    - name: Detect merge commits and sync image tags
+      id: detect_merge
+      run: |
+        # Check if this is a merge commit
+        COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+        IS_MERGE=false
+        SOURCE_BRANCH=""
+
+        if [[ "$COMMIT_MESSAGE" =~ "Merge branch 'develop' into staging" ]] || [[ "$COMMIT_MESSAGE" =~ "Merge develop into staging" ]]; then
+          IS_MERGE=true
+          SOURCE_BRANCH="develop"
+          echo "🔀 Detected merge from develop to staging"
+        elif [[ "$COMMIT_MESSAGE" =~ "Merge branch 'staging' into main" ]] || [[ "$COMMIT_MESSAGE" =~ "Merge staging into main" ]]; then
+          IS_MERGE=true
+          SOURCE_BRANCH="staging"
+          echo "🔀 Detected merge from staging to main"
+        fi
+
+        echo "is_merge=$IS_MERGE" >> $GITHUB_OUTPUT
+        echo "source_branch=$SOURCE_BRANCH" >> $GITHUB_OUTPUT
+
+    - name: Sync image tags from source branch (for merges)
+      if: steps.detect_merge.outputs.is_merge == 'true'
+      run: |
+        SOURCE_BRANCH="${{ steps.detect_merge.outputs.source_branch }}"
+
+        if [[ "${{ github.ref }}" == "refs/heads/staging" ]] && [[ "$SOURCE_BRANCH" == "develop" ]]; then
+          # Sync development tag to staging
+          SOURCE_TAG=$(grep "newTag:" k8s/overlays/development/kustomization.yaml | awk '{print $2}')
+          echo "📦 Syncing image tag from development to staging: $SOURCE_TAG"
+          sed -i "s|newTag: .*|newTag: $SOURCE_TAG|" k8s/overlays/staging/kustomization.yaml
+          echo "synced_tag=$SOURCE_TAG" >> $GITHUB_OUTPUT
+        elif [[ "${{ github.ref }}" == "refs/heads/main" ]] && [[ "$SOURCE_BRANCH" == "staging" ]]; then
+          # Sync staging tag to production
+          SOURCE_TAG=$(grep "newTag:" k8s/overlays/staging/kustomization.yaml | awk '{print $2}')
+          echo "📦 Syncing image tag from staging to production: $SOURCE_TAG"
+          sed -i "s|newTag: .*|newTag: $SOURCE_TAG|" k8s/overlays/production/kustomization.yaml
+          echo "synced_tag=$SOURCE_TAG" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Update image tags in manifests (for regular commits)
+      if: steps.detect_merge.outputs.is_merge == 'false'
       run: |
         # Get the commit SHA for unique tagging
         COMMIT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
@@ -162,9 +203,16 @@ jobs:
         if git diff --staged --quiet; then
           echo "No changes to commit"
         else
-          COMMIT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          IMAGE_TAG="sha-${COMMIT_SHA}"
-          git commit -m "chore: update image tag to $IMAGE_TAG [skip ci]"
+          # Determine commit message based on whether this was a merge or regular commit
+          if [[ "${{ steps.detect_merge.outputs.is_merge }}" == "true" ]]; then
+            SOURCE_BRANCH="${{ steps.detect_merge.outputs.source_branch }}"
+            SYNCED_TAG=$(grep "newTag:" k8s/overlays/$([[ "${{ github.ref }}" == "refs/heads/staging" ]] && echo "staging" || echo "production")/kustomization.yaml | awk '{print $2}')
+            git commit -m "chore: sync image tag from $SOURCE_BRANCH ($SYNCED_TAG) [skip ci]"
+          else
+            COMMIT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+            IMAGE_TAG="sha-${COMMIT_SHA}"
+            git commit -m "chore: update image tag to $IMAGE_TAG [skip ci]"
+          fi
           git push
         fi
 
