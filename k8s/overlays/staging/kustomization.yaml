@@ -17,7 +17,7 @@ commonLabels:
 
 images:
 - name: ghcr.io/pablodelarco/roomio
-  newTag: sha-769ac7f
+  newTag: sha-63258d1
 
 patchesStrategicMerge:
 - deployment-patch.yaml

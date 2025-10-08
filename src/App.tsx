@@ -9,6 +9,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { AIChat } from "@/components/AIChat";
 import Index from "./pages/Index";
 import Apartments from "./pages/Apartments";
 import Tenants from "./pages/Tenants";
@@ -59,6 +60,7 @@ const App = () => (
                         </div>
                       </main>
                     </div>
+                    <AIChat />
                   </SidebarProvider>
                 </ProtectedRoute>
               } />
