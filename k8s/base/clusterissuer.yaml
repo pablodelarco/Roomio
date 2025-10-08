@@ -4,7 +4,7 @@ metadata:
   name: letsencrypt-prod
   labels:
     app.kubernetes.io/name: letsencrypt-prod
-    app.kubernetes.io/part-of: staywell-manager
+    app.kubernetes.io/part-of: roomio
 spec:
   acme:
     # Let's Encrypt production server
@@ -20,8 +20,8 @@ spec:
             key: api-token
       selector:
         dnsNames:
-        - "pablodelarco.com"
-        - "*.pablodelarco.com"
+        - "roomiorentals.com"
+        - "*.roomiorentals.com"
 ---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -29,7 +29,7 @@ metadata:
   name: letsencrypt-staging
   labels:
     app.kubernetes.io/name: letsencrypt-staging
-    app.kubernetes.io/part-of: staywell-manager
+    app.kubernetes.io/part-of: roomio
 spec:
   acme:
     # Let's Encrypt staging server (for testing)
@@ -45,5 +45,5 @@ spec:
             key: api-token
       selector:
         dnsNames:
-        - "pablodelarco.com"
-        - "*.pablodelarco.com"
+        - "roomiorentals.com"
+        - "*.roomiorentals.com"
