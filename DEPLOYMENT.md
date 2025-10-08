@@ -22,59 +22,55 @@ This project uses a GitOps workflow with three environments:
 When you're ready to promote development to staging:
 
 ```bash
-# 1. Merge develop into staging
+# Simply merge develop into staging - CI/CD will automatically sync the image tag!
 git checkout staging
 git pull origin staging
 git merge develop --no-edit
-
-# 2. Sync the image tag from development to staging
-./scripts/sync-image-tags.sh development staging
-
-# 3. Commit and push
-git add k8s/overlays/staging/kustomization.yaml
-git commit -m "Promote development to staging"
 git push origin staging
-
-# 4. Return to develop
 git checkout develop
 ```
 
-ArgoCD will automatically deploy the same Docker image to staging within 3 minutes.
+**What happens automatically:**
+1. GitHub Actions detects the merge commit
+2. Extracts the image tag from `k8s/overlays/development/kustomization.yaml`
+3. Updates `k8s/overlays/staging/kustomization.yaml` with the same tag
+4. Commits and pushes the change with `[skip ci]`
+5. ArgoCD deploys the same Docker image to staging within 3 minutes
 
 ## Promoting to Production
 
 When staging is tested and ready for production:
 
 ```bash
-# 1. Merge staging into main
+# Simply merge staging into main - CI/CD will automatically sync the image tag!
 git checkout main
 git pull origin main
 git merge staging --no-edit
-
-# 2. Sync the image tag from staging to production
-./scripts/sync-image-tags.sh staging production
-
-# 3. Commit and push
-git add k8s/overlays/production/kustomization.yaml
-git commit -m "Promote staging to production"
 git push origin main
-
-# 4. Return to develop
 git checkout develop
 ```
 
-ArgoCD will automatically deploy to production within 3 minutes.
+**What happens automatically:**
+1. GitHub Actions detects the merge commit
+2. Extracts the image tag from `k8s/overlays/staging/kustomization.yaml`
+3. Updates `k8s/overlays/production/kustomization.yaml` with the same tag
+4. Commits and pushes the change with `[skip ci]`
+5. ArgoCD deploys to production within 3 minutes
 
 ## Important Notes
 
-### Why We Need to Sync Image Tags
+### How Automatic Image Tag Syncing Works
 
 Each environment has its own `kustomization.yaml` file with its own image tag:
 - `k8s/overlays/development/kustomization.yaml` → Updated when pushing to `develop`
-- `k8s/overlays/staging/kustomization.yaml` → Updated when pushing to `staging`
-- `k8s/overlays/production/kustomization.yaml` → Updated when pushing to `main`
+- `k8s/overlays/staging/kustomization.yaml` → Updated when pushing to `staging` OR when merging from `develop`
+- `k8s/overlays/production/kustomization.yaml` → Updated when pushing to `main` OR when merging from `staging`
 
-When you merge branches, **the code merges but the image tags don't automatically sync**. That's why we use the `sync-image-tags.sh` script to copy the image tag from the source environment to the target environment.
+**The CI/CD pipeline automatically detects merge commits** and syncs image tags:
+- When merging `develop` → `staging`: Copies the image tag from development to staging
+- When merging `staging` → `main`: Copies the image tag from staging to production
+
+This ensures that when you promote code between environments, you're deploying the exact same Docker image.
 
 ### Verifying Deployments
 
@@ -98,11 +94,13 @@ If you need to rollback to a previous version:
 # Find the previous image tag
 git log --oneline k8s/overlays/production/kustomization.yaml
 
-# Manually update the tag
-./scripts/sync-image-tags.sh <source-overlay> production
-
-# Or manually edit and set a specific tag
+# Manually edit the kustomization.yaml and set the desired tag
 # Then commit and push
+git checkout main
+# Edit k8s/overlays/production/kustomization.yaml manually
+git add k8s/overlays/production/kustomization.yaml
+git commit -m "Rollback to previous version"
+git push origin main
 ```
 
 ## Troubleshooting

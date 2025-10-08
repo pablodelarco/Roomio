@@ -126,19 +126,35 @@ jobs:
     - name: Detect merge commits and sync image tags
       id: detect_merge
       run: |
-        # Check if this is a merge commit
+        # Check if this is a merge commit by checking parent count
+        PARENT_COUNT=$(git rev-list --parents -n 1 HEAD | wc -w)
         COMMIT_MESSAGE=$(git log -1 --pretty=%B)
         IS_MERGE=false
         SOURCE_BRANCH=""
 
-        if [[ "$COMMIT_MESSAGE" =~ "Merge branch 'develop' into staging" ]] || [[ "$COMMIT_MESSAGE" =~ "Merge develop into staging" ]]; then
-          IS_MERGE=true
-          SOURCE_BRANCH="develop"
-          echo "🔀 Detected merge from develop to staging"
-        elif [[ "$COMMIT_MESSAGE" =~ "Merge branch 'staging' into main" ]] || [[ "$COMMIT_MESSAGE" =~ "Merge staging into main" ]]; then
-          IS_MERGE=true
-          SOURCE_BRANCH="staging"
-          echo "🔀 Detected merge from staging to main"
+        # A merge commit has 2+ parents (current commit + parent commits)
+        if [ "$PARENT_COUNT" -gt 2 ]; then
+          echo "📋 Merge commit detected"
+          echo "📝 Commit message: $COMMIT_MESSAGE"
+
+          # Detect which branches are being merged based on current branch
+          if [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+            # We're on staging, so this should be a merge from develop
+            if [[ "$COMMIT_MESSAGE" =~ "develop" ]] || [[ "$COMMIT_MESSAGE" =~ "Merge" ]]; then
+              IS_MERGE=true
+              SOURCE_BRANCH="develop"
+              echo "🔀 Detected merge from develop to staging"
+            fi
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            # We're on main, so this should be a merge from staging
+            if [[ "$COMMIT_MESSAGE" =~ "staging" ]] || [[ "$COMMIT_MESSAGE" =~ "Merge" ]]; then
+              IS_MERGE=true
+              SOURCE_BRANCH="staging"
+              echo "🔀 Detected merge from staging to main"
+            fi
+          fi
+        else
+          echo "📋 Regular commit (not a merge)"
         fi
 
         echo "is_merge=$IS_MERGE" >> $GITHUB_OUTPUT
