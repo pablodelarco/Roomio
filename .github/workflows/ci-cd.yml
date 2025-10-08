@@ -257,8 +257,8 @@ jobs:
 
     - name: Wait for ArgoCD sync
       run: |
-        echo "⏳ Waiting 180 seconds for ArgoCD to sync..."
-        sleep 180
+        echo "⏳ Waiting 15 seconds for ArgoCD to sync..."
+        sleep 15
 
     - name: Run smoke tests on development
       run: |
@@ -290,8 +290,8 @@ jobs:
 
     - name: Wait for ArgoCD sync
       run: |
-        echo "⏳ Waiting 180 seconds for ArgoCD to sync..."
-        sleep 180
+        echo "⏳ Waiting 15 seconds for ArgoCD to sync..."
+        sleep 15
 
     - name: Run smoke tests on staging
       run: |
@@ -327,8 +327,8 @@ jobs:
 
     - name: Wait for ArgoCD sync
       run: |
-        echo "⏳ Waiting 180 seconds for ArgoCD to sync..."
-        sleep 180
+        echo "⏳ Waiting 15 seconds for ArgoCD to sync..."
+        sleep 15
 
     - name: Run smoke tests on production
       run: |
