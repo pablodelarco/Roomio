@@ -1,14 +1,14 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: staywell-network-policy
+  name: roomio-network-policy
   labels:
-    app.kubernetes.io/name: staywell-network-policy
-    app.kubernetes.io/part-of: staywell-manager
+    app.kubernetes.io/name: roomio-network-policy
+    app.kubernetes.io/part-of: roomio
 spec:
   podSelector:
     matchLabels:
-      app: staywell-frontend
+      app: roomio-frontend
   policyTypes:
   - Ingress
   - Egress
@@ -30,10 +30,10 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: staywell-security-headers
+  name: roomio-security-headers
   labels:
-    app.kubernetes.io/name: staywell-security-headers
-    app.kubernetes.io/part-of: staywell-manager
+    app.kubernetes.io/name: roomio-security-headers
+    app.kubernetes.io/part-of: roomio
 type: Opaque
 stringData:
   security-headers.yaml: |

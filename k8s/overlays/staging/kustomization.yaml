@@ -16,13 +16,12 @@ commonLabels:
   app.kubernetes.io/instance: roomio-staging
 
 images:
-- name: ghcr.io/pablodelarco/staywell-manager-e301a7db
+- name: ghcr.io/pablodelarco/roomio
   newTag: sha-4a2c559
 
 patchesStrategicMerge:
 - deployment-patch.yaml
 - ingress-patch.yaml
-- certificate-patch.yaml
 
 replicas:
 - name: roomio-frontend
