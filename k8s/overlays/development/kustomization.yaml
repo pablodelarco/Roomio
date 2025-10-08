@@ -16,13 +16,8 @@ commonLabels:
   app.kubernetes.io/instance: roomio-dev
 
 images:
-<<<<<<< HEAD
-- name: ghcr.io/pablodelarco/staywell-manager-e301a7db
-  newTag: sha-99ab12c
-=======
 - name: ghcr.io/pablodelarco/roomio
-  newTag: sha-99ab12c
->>>>>>> c294379 (Remove all TLS-related files - Cloudflare handles SSL termination)
+  newTag: sha-ec9feef
 
 patchesStrategicMerge:
 - deployment-patch.yaml
