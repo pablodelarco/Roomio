@@ -12,7 +12,6 @@ resources:
 - clusterissuer.yaml
 - certificate.yaml
 - security-policy.yaml
-- cloudflare-secret.yaml
 - tls-config.yaml
 - cert-monitoring.yaml
 
