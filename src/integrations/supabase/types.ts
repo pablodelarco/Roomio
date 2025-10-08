@@ -220,6 +220,7 @@ export type Database = {
           lease_start: string
           phone: string | null
           room_id: string
+          tenant_user_id: string | null
           updated_at: string
           user_id: string
         }
@@ -236,6 +237,7 @@ export type Database = {
           lease_start: string
           phone?: string | null
           room_id: string
+          tenant_user_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -252,6 +254,7 @@ export type Database = {
           lease_start?: string
           phone?: string | null
           room_id?: string
+          tenant_user_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -303,6 +306,14 @@ export type Database = {
       }
       is_property_manager: {
         Args: { _user_id: string }
+        Returns: boolean
+      }
+      landlord_owns_tenant: {
+        Args: { _landlord_id: string; _tenant_id: string }
+        Returns: boolean
+      }
+      user_owns_tenant_apartment: {
+        Args: { _tenant_id: string; _user_id: string }
         Returns: boolean
       }
     }

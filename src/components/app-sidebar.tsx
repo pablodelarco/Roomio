@@ -1,4 +1,4 @@
-import { Building2, Home, Users, CreditCard, Settings, BarChart3, Receipt } from "lucide-react"
+import { Building2, Home, Users, CreditCard, Settings, BarChart3, Receipt, HelpCircle } from "lucide-react"
 import { NavLink, useLocation } from "react-router-dom"
 
 import {
@@ -24,6 +24,7 @@ const navigationItems = [
   { title: "Payments", url: "/payments", icon: CreditCard },
   { title: "Reports", url: "/reports", icon: BarChart3 },
   { title: "Settings", url: "/settings", icon: Settings },
+  { title: "Help", url: "/help", icon: HelpCircle },
 ]
 
 export function AppSidebar() {
@@ -51,7 +52,7 @@ export function AppSidebar() {
               <Building2 className="h-4 w-4 text-sidebar-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-sidebar-foreground">StayWell</h1>
+              <h1 className="text-lg font-semibold text-sidebar-foreground">Roomio</h1>
               <p className="text-xs text-sidebar-foreground/60">Property Manager</p>
             </div>
           </div>
