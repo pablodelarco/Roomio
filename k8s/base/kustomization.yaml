@@ -9,11 +9,7 @@ resources:
 - deployment.yaml
 - service.yaml
 - ingress.yaml
-- clusterissuer.yaml
-- certificate.yaml
 - security-policy.yaml
-- tls-config.yaml
-- cert-monitoring.yaml
 
 commonLabels:
   app.kubernetes.io/part-of: roomio
