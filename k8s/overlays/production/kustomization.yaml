@@ -17,7 +17,7 @@ commonLabels:
 
 images:
 - name: ghcr.io/pablodelarco/staywell-manager-e301a7db
-  newTag: sha-95ff842
+  newTag: sha-d216f26
 
 patchesStrategicMerge:
 - deployment-patch.yaml
