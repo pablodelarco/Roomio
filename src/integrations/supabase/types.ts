@@ -220,6 +220,7 @@ export type Database = {
           lease_start: string
           phone: string | null
           room_id: string
+          tenant_user_id: string | null
           updated_at: string
           user_id: string
         }
@@ -236,6 +237,7 @@ export type Database = {
           lease_start: string
           phone?: string | null
           room_id: string
+          tenant_user_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -252,6 +254,7 @@ export type Database = {
           lease_start?: string
           phone?: string | null
           room_id?: string
+          tenant_user_id?: string | null
           updated_at?: string
           user_id?: string
         }
