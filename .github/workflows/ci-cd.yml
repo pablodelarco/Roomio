@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: staywell-manager-e301a7db
+  IMAGE_NAME: roomio
 
 jobs:
   test:
@@ -179,7 +179,7 @@ jobs:
     - name: Development Deployment Summary
       run: |
         echo "🚀 Development deployment triggered"
-        echo "📦 Image: ghcr.io/pablodelarco/staywell-manager-e301a7db:develop"
+        echo "📦 Image: ghcr.io/pablodelarco/roomio:sha-$(echo ${{ github.sha }} | cut -c1-7)"
         echo "🎯 Namespace: roomio-dev"
         echo "🔄 ArgoCD will automatically sync the changes within 3 minutes"
         echo "🌐 Access: https://dev.roomiorentals.com"
@@ -193,7 +193,7 @@ jobs:
     - name: Staging Deployment Summary
       run: |
         echo "🚀 Staging deployment triggered"
-        echo "📦 Image: ghcr.io/pablodelarco/staywell-manager-e301a7db:staging"
+        echo "📦 Image: ghcr.io/pablodelarco/roomio:sha-$(echo ${{ github.sha }} | cut -c1-7)"
         echo "🎯 Namespace: roomio-staging"
         echo "🔄 ArgoCD will automatically sync the changes within 3 minutes"
         echo "🌐 Access: https://staging.roomiorentals.com"
@@ -207,7 +207,7 @@ jobs:
     - name: Production Deployment Summary
       run: |
         echo "🚀 Production deployment triggered"
-        echo "📦 Image: ghcr.io/pablodelarco/staywell-manager-e301a7db:latest"
+        echo "📦 Image: ghcr.io/pablodelarco/roomio:sha-$(echo ${{ github.sha }} | cut -c1-7)"
         echo "🎯 Namespace: roomio-prod"
         echo "🔄 ArgoCD will automatically sync the changes within 3 minutes"
         echo "🌐 Access: https://roomiorentals.com"
