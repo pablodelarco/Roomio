@@ -1,4 +1,4 @@
-// StayWell Manager Supabase Client Configuration
+// Roomio Supabase Client Configuration
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
@@ -23,7 +23,7 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   },
   global: {
     headers: {
-      'X-Client-Info': `staywell-manager@${import.meta.env.VITE_APP_VERSION || '1.0.0'}`,
+      'X-Client-Info': `roomio@${import.meta.env.VITE_APP_VERSION || '1.0.0'}`,
     },
   },
 });

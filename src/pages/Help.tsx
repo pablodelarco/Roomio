@@ -8,7 +8,7 @@ export default function Help() {
       <div>
         <h1 className="text-3xl font-bold mb-2">Help & Support</h1>
         <p className="text-muted-foreground">
-          Get assistance with StayWell Property Manager
+          Get assistance with Roomio Property Manager
         </p>
       </div>
 

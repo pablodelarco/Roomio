@@ -25,7 +25,7 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="light" storageKey="staywell-theme">
+    <ThemeProvider defaultTheme="light" storageKey="roomio-theme">
       <TooltipProvider>
         <Toaster />
         <Sonner />
