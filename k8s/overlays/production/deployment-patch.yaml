@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: roomio-frontend
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    spec:
+      # Production: No node selector for best distribution
+      nodeSelector: {}
+      # Add anti-affinity to spread pods across nodes
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - roomio-frontend
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: frontend
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: ENVIRONMENT
+          value: "production"
+        resources:
+          requests:
+            memory: "128Mi"  # Higher resources for production
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"

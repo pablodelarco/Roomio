@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: roomio-ingress
+  annotations:
+    # Basic TLS configuration
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: traefik
+  tls:
+  - hosts:
+    - roomiorentals.com
+    secretName: prod-roomio-tls-secret
+  rules:
+  - host: roomiorentals.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: prod-roomio-frontend-service
+            port:
+              number: 80

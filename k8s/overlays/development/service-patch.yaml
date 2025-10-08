@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: roomio-frontend-service
+spec:
+  type: ClusterIP  # Use ClusterIP for ingress compatibility
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: http

@@ -1,8 +1,8 @@
 version: '3.8'
 
 services:
-  # StayWell Manager Frontend
-  staywell-frontend:
+  # Roomio Frontend
+  roomio-frontend:
     build:
       context: .
       dockerfile: Dockerfile
@@ -18,48 +18,3 @@ services:
       retries: 3
       start_period: 40s
     restart: unless-stopped
-    networks:
-      - staywell-network
-
-  # Redis for caching (future use)
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    command: redis-server --appendonly yes
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    restart: unless-stopped
-    networks:
-      - staywell-network
-
-  # Nginx reverse proxy (for future API)
-  nginx-proxy:
-    image: nginx:1.25-alpine
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx-proxy.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - staywell-frontend
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    restart: unless-stopped
-    networks:
-      - staywell-network
-
-volumes:
-  redis_data:
-    driver: local
-
-networks:
-  staywell-network:
-    driver: bridge

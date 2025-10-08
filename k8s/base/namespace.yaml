@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: roomio
+  labels:
+    name: roomio
+    app.kubernetes.io/name: roomio
+    app.kubernetes.io/part-of: roomio
