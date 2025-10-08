@@ -244,6 +244,9 @@ jobs:
     if: github.ref == 'refs/heads/develop'
 
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
     - name: Development Deployment Summary
       run: |
         echo "🚀 Development deployment triggered"
@@ -252,12 +255,31 @@ jobs:
         echo "🔄 ArgoCD will automatically sync the changes within 3 minutes"
         echo "🌐 Access: https://dev.roomiorentals.com"
 
+    - name: Wait for ArgoCD sync
+      run: |
+        echo "⏳ Waiting 180 seconds for ArgoCD to sync..."
+        sleep 180
+
+    - name: Run smoke tests on development
+      run: |
+        chmod +x scripts/smoke-test.sh
+        ./scripts/smoke-test.sh https://dev.roomiorentals.com
+
+    - name: Notify deployment success
+      if: success()
+      run: |
+        echo "✅ Development deployment successful!"
+        echo "🧪 All smoke tests passed"
+
   deploy-staging:
     needs: build-and-push
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/staging'
 
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
     - name: Staging Deployment Summary
       run: |
         echo "🚀 Staging deployment triggered"
@@ -266,12 +288,35 @@ jobs:
         echo "🔄 ArgoCD will automatically sync the changes within 3 minutes"
         echo "🌐 Access: https://staging.roomiorentals.com"
 
+    - name: Wait for ArgoCD sync
+      run: |
+        echo "⏳ Waiting 180 seconds for ArgoCD to sync..."
+        sleep 180
+
+    - name: Run smoke tests on staging
+      run: |
+        chmod +x scripts/smoke-test.sh
+        ./scripts/smoke-test.sh https://staging.roomiorentals.com
+
+    - name: Notify deployment success
+      if: success()
+      run: |
+        echo "✅ Staging deployment successful!"
+        echo "🧪 All smoke tests passed"
+        echo "📋 Ready for production promotion"
+
   deploy-prod:
     needs: build-and-push
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://roomiorentals.com
 
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
     - name: Production Deployment Summary
       run: |
         echo "🚀 Production deployment triggered"
@@ -279,3 +324,20 @@ jobs:
         echo "🎯 Namespace: roomio-prod"
         echo "🔄 ArgoCD will automatically sync the changes within 3 minutes"
         echo "🌐 Access: https://roomiorentals.com"
+
+    - name: Wait for ArgoCD sync
+      run: |
+        echo "⏳ Waiting 180 seconds for ArgoCD to sync..."
+        sleep 180
+
+    - name: Run smoke tests on production
+      run: |
+        chmod +x scripts/smoke-test.sh
+        ./scripts/smoke-test.sh https://roomiorentals.com
+
+    - name: Notify deployment success
+      if: success()
+      run: |
+        echo "✅ Production deployment successful!"
+        echo "🧪 All smoke tests passed"
+        echo "🎉 New version is live!"
