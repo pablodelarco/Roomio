@@ -18,10 +18,10 @@ commonLabels:
 images:
 <<<<<<< HEAD
 - name: ghcr.io/pablodelarco/staywell-manager-e301a7db
-  newTag: sha-99ab12c
+  newTag: sha-ec9feef
 =======
 - name: ghcr.io/pablodelarco/roomio
-  newTag: sha-99ab12c
+  newTag: sha-ec9feef
 >>>>>>> c294379 (Remove all TLS-related files - Cloudflare handles SSL termination)
 
 patchesStrategicMerge:
