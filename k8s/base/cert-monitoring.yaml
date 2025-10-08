@@ -4,7 +4,7 @@ metadata:
   name: cert-monitoring-script
   labels:
     app.kubernetes.io/name: cert-monitoring
-    app.kubernetes.io/part-of: staywell-manager
+    app.kubernetes.io/part-of: roomio
 data:
   check-certs.sh: |
     #!/bin/bash
@@ -47,7 +47,7 @@ metadata:
   name: cert-monitoring
   labels:
     app.kubernetes.io/name: cert-monitoring
-    app.kubernetes.io/part-of: staywell-manager
+    app.kubernetes.io/part-of: roomio
 spec:
   schedule: "0 */6 * * *"  # Every 6 hours
   jobTemplate:
@@ -77,7 +77,7 @@ metadata:
   name: cert-monitoring
   labels:
     app.kubernetes.io/name: cert-monitoring
-    app.kubernetes.io/part-of: staywell-manager
+    app.kubernetes.io/part-of: roomio
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -85,7 +85,7 @@ metadata:
   name: cert-monitoring
   labels:
     app.kubernetes.io/name: cert-monitoring
-    app.kubernetes.io/part-of: staywell-manager
+    app.kubernetes.io/part-of: roomio
 rules:
 - apiGroups: ["cert-manager.io"]
   resources: ["certificates", "clusterissuers", "challenges"]
@@ -100,7 +100,7 @@ metadata:
   name: cert-monitoring
   labels:
     app.kubernetes.io/name: cert-monitoring
-    app.kubernetes.io/part-of: staywell-manager
+    app.kubernetes.io/part-of: roomio
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

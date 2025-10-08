@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: staywell-frontend
+  name: roomio-frontend
 spec:
   strategy:
     type: RollingUpdate
@@ -23,7 +23,7 @@ spec:
                 - key: app
                   operator: In
                   values:
-                  - staywell-frontend
+                  - roomio-frontend
               topologyKey: kubernetes.io/hostname
       containers:
       - name: frontend

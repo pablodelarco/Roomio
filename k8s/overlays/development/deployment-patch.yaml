@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: staywell-frontend
+  name: roomio-frontend
 spec:
   template:
     spec:

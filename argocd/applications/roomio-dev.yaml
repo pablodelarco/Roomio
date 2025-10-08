@@ -1,20 +1,20 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: staywell-manager-dev
+  name: roomio-dev
   namespace: argocd
   labels:
-    app: staywell-manager
+    app: roomio
     environment: development
 spec:
   project: default
   source:
-    repoURL: https://github.com/pablodelarco/staywell-manager-e301a7db-1
+    repoURL: https://github.com/pablodelarco/Roomio
     targetRevision: develop
-    path: k8s
+    path: k8s/overlays/development
   destination:
     server: https://kubernetes.default.svc
-    namespace: staywell-manager-dev
+    namespace: roomio-dev
   syncPolicy:
     automated:
       prune: true

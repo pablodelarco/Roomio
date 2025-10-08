@@ -1,17 +1,17 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: staywell-tls
+  name: roomio-tls
   labels:
-    app.kubernetes.io/name: staywell-tls
-    app.kubernetes.io/part-of: staywell-manager
+    app.kubernetes.io/name: roomio-tls
+    app.kubernetes.io/part-of: roomio
 spec:
-  secretName: staywell-tls-secret
+  secretName: roomio-tls-secret
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
   dnsNames:
-  - pablodelarco.com  # Will be overridden by overlays
+  - roomiorentals.com  # Will be overridden by overlays
   usages:
   - digital signature
   - key encipherment
@@ -21,9 +21,9 @@ spec:
   # Subject settings
   subject:
     organizationalUnits:
-    - "StayWell Manager"
+    - "Roomio"
     organizations:
-    - "Pablo del Arco"
+    - "Roomio"
     countries:
     - "ES"
   # Private key settings

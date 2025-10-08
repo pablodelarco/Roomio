@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: staywell-manager
+  name: roomio
   labels:
-    name: staywell-manager
-    app.kubernetes.io/name: staywell-manager
-    app.kubernetes.io/part-of: staywell-manager
+    name: roomio
+    app.kubernetes.io/name: roomio
+    app.kubernetes.io/part-of: roomio

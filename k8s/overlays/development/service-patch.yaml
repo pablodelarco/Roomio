@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: staywell-frontend-service
+  name: roomio-frontend-service
 spec:
   type: ClusterIP  # Use ClusterIP for ingress compatibility
   ports:

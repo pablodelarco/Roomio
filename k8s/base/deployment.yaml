@@ -1,24 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: staywell-frontend
+  name: roomio-frontend
   labels:
-    app: staywell-frontend
-    app.kubernetes.io/name: staywell-frontend
-    app.kubernetes.io/part-of: staywell-manager
+    app: roomio-frontend
+    app.kubernetes.io/name: roomio-frontend
+    app.kubernetes.io/part-of: roomio
 spec:
   replicas: 1  # Will be overridden by overlays
   revisionHistoryLimit: 3
   selector:
     matchLabels:
-      app: staywell-frontend
+      app: roomio-frontend
   template:
     metadata:
       labels:
-        app: staywell-frontend
-        app.kubernetes.io/name: staywell-frontend
-        app.kubernetes.io/part-of: staywell-manager
+        app: roomio-frontend
+        app.kubernetes.io/name: roomio-frontend
+        app.kubernetes.io/part-of: roomio
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: beelink
+      tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
       containers:
       - name: frontend
         image: ghcr.io/pablodelarco/staywell-manager-e301a7db:latest  # Will be overridden

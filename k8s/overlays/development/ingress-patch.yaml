@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: staywell-ingress
+  name: roomio-ingress
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
@@ -11,16 +11,16 @@ metadata:
 spec:
   tls:
   - hosts:
-    - dev.pablodelarco.com
-    secretName: dev-staywell-tls-secret
+    - dev.roomiorentals.com
+    secretName: dev-roomio-tls-secret
   rules:
-  - host: dev.pablodelarco.com
+  - host: dev.roomiorentals.com
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: dev-staywell-frontend-service
+            name: dev-roomio-frontend-service
             port:
               number: 80

@@ -1,14 +1,14 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: staywell-tls
+  name: roomio-tls
 spec:
-  secretName: dev-staywell-tls-secret
+  secretName: dev-roomio-tls-secret
   issuerRef:
     name: letsencrypt-staging  # Use staging for development
     kind: ClusterIssuer
   dnsNames:
-  - dev.pablodelarco.com
+  - dev.roomiorentals.com
   usages:
   - digital signature
   - key encipherment
