@@ -42,6 +42,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch full history to detect merge commits properly
     
     - name: Log in to Container Registry
       uses: docker/login-action@v3
@@ -126,37 +128,41 @@ jobs:
     - name: Detect merge commits and sync image tags
       id: detect_merge
       run: |
-        # Check if this is a merge commit by checking parent count
-        PARENT_COUNT=$(git rev-list --parents -n 1 HEAD | wc -w)
+        # Check if this is a merge commit
+        PARENT_COUNT=$(git cat-file -p HEAD | grep "^parent" | wc -l)
         COMMIT_MESSAGE=$(git log -1 --pretty=%B)
         IS_MERGE=false
         SOURCE_BRANCH=""
 
-        # A merge commit has 2+ parents (current commit + parent commits)
-        if [ "$PARENT_COUNT" -gt 2 ]; then
-          echo "📋 Merge commit detected"
-          echo "📝 Commit message: $COMMIT_MESSAGE"
+        echo "📊 Parent count: $PARENT_COUNT"
+        echo "📝 Commit message: $COMMIT_MESSAGE"
 
-          # Detect which branches are being merged based on current branch
+        # A merge commit has 2 or more parents
+        if [ "$PARENT_COUNT" -ge 2 ]; then
+          echo "📋 Merge commit detected!"
+
+          # Detect which branches are being merged based on current branch and commit message
           if [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
-            # We're on staging, so this should be a merge from develop
-            if [[ "$COMMIT_MESSAGE" =~ "develop" ]] || [[ "$COMMIT_MESSAGE" =~ "Merge" ]]; then
+            # We're on staging, check if this is a merge from develop
+            if [[ "$COMMIT_MESSAGE" =~ "develop" ]]; then
               IS_MERGE=true
               SOURCE_BRANCH="develop"
-              echo "🔀 Detected merge from develop to staging"
+              echo "🔀 Confirmed: Merge from develop to staging"
             fi
           elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            # We're on main, so this should be a merge from staging
-            if [[ "$COMMIT_MESSAGE" =~ "staging" ]] || [[ "$COMMIT_MESSAGE" =~ "Merge" ]]; then
+            # We're on main, check if this is a merge from staging
+            if [[ "$COMMIT_MESSAGE" =~ "staging" ]]; then
               IS_MERGE=true
               SOURCE_BRANCH="staging"
-              echo "🔀 Detected merge from staging to main"
+              echo "🔀 Confirmed: Merge from staging to main"
             fi
           fi
         else
           echo "📋 Regular commit (not a merge)"
         fi
 
+        echo "✅ is_merge=$IS_MERGE"
+        echo "✅ source_branch=$SOURCE_BRANCH"
         echo "is_merge=$IS_MERGE" >> $GITHUB_OUTPUT
         echo "source_branch=$SOURCE_BRANCH" >> $GITHUB_OUTPUT
 
