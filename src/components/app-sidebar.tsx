@@ -1,4 +1,4 @@
-import { Building2, Home, Users, CreditCard, Settings, BarChart3, Receipt } from "lucide-react"
+import { Building2, Home, Users, CreditCard, Settings, BarChart3, Receipt, HelpCircle } from "lucide-react"
 import { NavLink, useLocation } from "react-router-dom"
 
 import {
@@ -24,6 +24,7 @@ const navigationItems = [
   { title: "Payments", url: "/payments", icon: CreditCard },
   { title: "Reports", url: "/reports", icon: BarChart3 },
   { title: "Settings", url: "/settings", icon: Settings },
+  { title: "Help", url: "/help", icon: HelpCircle },
 ]
 
 export function AppSidebar() {
