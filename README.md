@@ -2,8 +2,10 @@
 
 **A comprehensive demonstration of enterprise-grade DevOps practices and cloud-native architecture.** This project showcases the complete journey from code to production using modern infrastructure automation, GitOps workflows, and Kubernetes orchestration.
 
-🌐 **Live Production**: [pablodelarco.com](https://pablodelarco.com)
+🌐 **Live Production**: [roomiorentals.com/](https://roomiorentals.com/)
+
 📊 **GitOps Dashboard**: ArgoCD-managed deployments
+
 🔄 **CI/CD Pipeline**: Automated testing, building, and deployment
 
 ## 🎯 DevOps & Infrastructure Focus
