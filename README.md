@@ -1,4 +1,4 @@
-# ☸️ Cloud-Native DevOps Platform
+# ☸️ Roomio: Real Estate SaaS for effortless property and tenant management
 
 **A comprehensive demonstration of enterprise-grade DevOps practices and cloud-native architecture.** This project showcases the complete journey from code to production using modern infrastructure automation, GitOps workflows, and Kubernetes orchestration.
 
