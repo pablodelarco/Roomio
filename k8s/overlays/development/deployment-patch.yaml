@@ -5,9 +5,9 @@ metadata:
 spec:
   template:
     spec:
-      # Development: Allow scheduling on specific node for local testing
+      # Development: Pin to worker node
       nodeSelector:
-        kubernetes.io/hostname: beelink
+        kubernetes.io/hostname: worker
       containers:
       - name: frontend
         env:
