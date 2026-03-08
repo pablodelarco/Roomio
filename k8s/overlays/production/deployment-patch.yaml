@@ -11,20 +11,8 @@ spec:
   template:
     spec:
       # Production: No node selector for best distribution
-      nodeSelector: {}
-      # Add anti-affinity to spread pods across nodes
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                  - roomio-frontend
-              topologyKey: kubernetes.io/hostname
+      nodeSelector:
+        kubernetes.io/hostname: worker
       containers:
       - name: frontend
         env:
