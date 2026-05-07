@@ -2,7 +2,7 @@
 
 **A comprehensive demonstration of enterprise-grade DevOps practices and cloud-native architecture.** This project showcases the complete journey from code to production using modern infrastructure automation, GitOps workflows, and Kubernetes orchestration.
 
-🌐 **Live Production**: [roomiorentals.com/](https://roomiorentals.com/)
+🌐 **Live Production**:
 
 📊 **GitOps Dashboard**: ArgoCD-managed deployments
 
