@@ -1,30 +1,28 @@
-# ☸️ Arco Rooms: Real Estate SaaS for effortless property and tenant management
+<div align="center">
 
-**A comprehensive demonstration of enterprise-grade DevOps practices and cloud-native architecture.** This project showcases the complete journey from code to production using modern infrastructure automation, GitOps workflows, and Kubernetes orchestration.
+# Arco Rooms
 
-🌐 **Live Production**:
+Property and tenant management SaaS, built with React and Supabase and delivered through a production-grade GitOps pipeline on Kubernetes.
 
-📊 **GitOps Dashboard**: ArgoCD-managed deployments
+[![GitHub Stars](https://img.shields.io/github/stars/pablodelarco/arco_rooms)](https://github.com/pablodelarco/arco_rooms/stargazers)
+[![CI/CD Pipeline](https://github.com/pablodelarco/arco_rooms/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/pablodelarco/arco_rooms/actions/workflows/ci-cd.yml)
+[![Top Language](https://img.shields.io/github/languages/top/pablodelarco/arco_rooms)](https://github.com/pablodelarco/arco_rooms)
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)](https://react.dev)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-Deployed-326CE5?logo=kubernetes&logoColor=white)](k8s/)
 
-🔄 **CI/CD Pipeline**: Automated testing, building, and deployment
+</div>
 
-## 🎯 DevOps & Infrastructure Focus
+## Why Arco Rooms?
 
-This project demonstrates **professional DevOps engineering** through:
+Managing rental properties means juggling apartments, tenants, rent payments, and utility bills across spreadsheets and chat threads. Arco Rooms centralizes all of it in one web app. The project is also a complete, working reference for taking a modern frontend from code to production with cloud-native tooling:
 
-- ☸️ **Kubernetes Orchestration**: Production-grade container orchestration
-- 🔄 **GitOps Workflow**: Declarative, Git-driven deployments with ArgoCD
-- 🚀 **CI/CD Automation**: GitHub Actions pipeline with testing and security scanning
-- 🐳 **Container Engineering**: Multi-stage Docker builds with security hardening
-- 🌐 **Cloud Infrastructure**: Global CDN, custom domains, and SSL automation
-- 🔒 **Security Integration**: Vulnerability scanning, OAuth, and network policies
-- 📊 **Infrastructure as Code**: Kubernetes manifests and automated provisioning
-- 🏗️ **Production Architecture**: Load balancing, auto-scaling, and monitoring
-- 🔧 **Development Workflow**: Local development to production deployment pipeline
+- **Full property workflow** 🏠: Apartments, tenants, payments, bills, and reports managed from a single dashboard with authentication and role-protected routes.
+- **GitOps by default**: Every deployment is declarative and Git-driven through ArgoCD, so changes are transparent, auditable, and easy to revert.
+- **Automated pipeline**: GitHub Actions runs tests, builds multi-stage Docker images, scans them with Trivy, and updates Kubernetes manifests on every push.
+- **Security built in**: OAuth 2.0 login, HTTPS end to end, non-root containers, and Kubernetes network policies.
+- **Real production setup**: Traefik ingress, Cloudflare CDN and tunnel, health checks, rolling updates, and multi-environment overlays (dev, staging, prod).
 
----
-
-## 🏗️ Architecture & Tech Stack
+## Architecture
 
 ### Complete System Architecture
 ```mermaid
@@ -134,40 +132,19 @@ graph LR
     ArgoCD --> K8s
 ```
 
-### 🛠️ DevOps Technology Stack
+### Stack at a Glance
 
-#### **🏗️ Infrastructure & Orchestration**
-- **Kubernetes**: Container orchestration with auto-scaling and health checks
-- **Traefik**: Cloud-native load balancer and ingress controller
-- **ArgoCD**: GitOps continuous deployment platform
-- **Cloudflare**: Global CDN, DNS management, and secure tunneling
+| Layer | Technologies |
+|---|---|
+| Application | React 18, TypeScript, Vite, Tailwind CSS, shadcn/ui, TanStack Query |
+| Backend | Supabase (managed PostgreSQL, authentication, real-time), Google OAuth 2.0 |
+| Containers | Docker multi-stage builds, Nginx static serving, non-root runtime |
+| Orchestration | Kubernetes, Kustomize overlays, Traefik ingress and load balancing |
+| CI/CD | GitHub Actions, Trivy vulnerability scanning, GitHub Container Registry, ArgoCD |
+| Networking | Cloudflare CDN, DNS, and secure tunnel, automated HTTPS/TLS, custom domain |
+| Observability | Liveness and readiness probes, resource limits and requests, GitOps deployment history |
 
-#### **🔄 CI/CD & Automation**
-- **GitHub Actions**: Automated testing, building, and deployment pipeline
-- **Docker**: Multi-stage container builds with security hardening
-- **Trivy**: Container vulnerability scanning and security compliance
-- **GitHub Container Registry**: Secure, private container image storage
-
-#### **🔒 Security & Networking**
-- **OAuth 2.0**: Secure authentication with Google integration
-- **HTTPS/TLS**: End-to-end encryption with automated certificate management
-- **Network Policies**: Kubernetes-native network segmentation
-- **Non-root Containers**: Security-hardened container runtime
-
-#### **📊 Monitoring & Observability**
-- **Health Checks**: Kubernetes liveness and readiness probes
-- **Resource Monitoring**: CPU, memory, and network metrics
-- **Deployment Tracking**: GitOps deployment history and rollback capabilities
-- **Log Aggregation**: Centralized logging for troubleshooting
-
-#### **🎨 Application Stack** *(Supporting the DevOps demonstration)*
-- **Frontend**: React 18 + TypeScript + Vite (modern build tooling)
-- **Backend**: Supabase (managed PostgreSQL + authentication)
-- **Styling**: Tailwind CSS + shadcn/ui (component library)
-
----
-
-## 🔄 CI/CD & GitOps Workflow
+## CI/CD and GitOps Workflow
 
 ### Deployment Flow
 ```mermaid
@@ -207,238 +184,134 @@ sequenceDiagram
 ```
 
 ### Workflow Steps
-1. **Push to `develop` branch** → Pipeline runs, builds container images, runs security scans, updates dev overlay → ArgoCD syncs to the development environment
-2. **Push to `main` branch** → Same pipeline, followed by ArgoCD deployment to production cluster
-3. **GitOps at the core**: Ensures deployments remain transparent, auditable, and easily revertible
-4. **Automated testing**: ESLint, TypeScript checking, and build validation
-5. **Security scanning**: Trivy vulnerability detection on container images
-6. **Rolling deployments**: Zero-downtime updates with health checks
+1. **Push to `develop` branch**: the pipeline runs, builds container images, runs security scans, and updates the dev overlay. ArgoCD syncs to the development environment.
+2. **Push to `main` branch**: the same pipeline runs, followed by ArgoCD deployment to the production cluster.
+3. **GitOps at the core**: deployments remain transparent, auditable, and easily revertible.
+4. **Automated testing**: ESLint, TypeScript checking, and build validation.
+5. **Security scanning**: Trivy vulnerability detection on container images.
+6. **Rolling deployments**: zero-downtime updates with health checks.
 
----
+## Quick Start
 
-## 🎯 DevOps Engineering Showcase
-
-This project demonstrates **professional-grade DevOps practices** and **cloud-native expertise**:
-
-### **🏗️ Infrastructure Engineering**
-- **Kubernetes Architecture**: Production-ready container orchestration with auto-scaling, health checks, and resource management
-- **GitOps Implementation**: Declarative infrastructure management with ArgoCD for auditable, version-controlled deployments
-- **Cloud-Native Networking**: Traefik ingress, Cloudflare CDN integration, and secure tunnel architecture
-- **Infrastructure as Code**: Kubernetes manifests, Kustomize overlays, and automated provisioning
-
-### **🔄 DevOps Pipeline Excellence**
-- **CI/CD Automation**: Complete GitHub Actions pipeline from code commit to production deployment
-- **Security Integration**: Automated vulnerability scanning, container hardening, and compliance checks
-- **Multi-Environment Strategy**: Development and production environments with promotion workflows
-- **Rollback Capabilities**: GitOps-enabled instant rollbacks and deployment history tracking
-
-### **� Production Security & Reliability**
-- **Zero-Downtime Deployments**: Rolling updates with health checks and graceful shutdowns
-- **Security Hardening**: Non-root containers, network policies, and OAuth integration
-- **Monitoring & Observability**: Comprehensive health checks, resource monitoring, and log aggregation
-- **Disaster Recovery**: Automated backups, multi-replica deployments, and failover strategies
-
-### **🌍 Enterprise-Grade Operations**
-- **Global Scale**: CDN integration, custom domain management, and worldwide accessibility
-- **Performance Optimization**: Container optimization, caching strategies, and resource efficiency
-- **Compliance Ready**: Security scanning, audit trails, and policy enforcement
-- **Operational Excellence**: Automated testing, deployment validation, and monitoring integration
-
----
-
-## 🚀 DevOps Implementation Guide
-
-### 🏗️ Infrastructure Prerequisites
+### Prerequisites
 - **Kubernetes Cluster**: K3s, EKS, GKE, or AKS
 - **ArgoCD**: GitOps deployment controller
-- **Traefik**: Ingress controller and load balancer
-- **Docker**: Container runtime and build system
-- **GitHub Actions**: CI/CD pipeline automation
+- **Traefik**: ingress controller and load balancer
+- **Docker**: container runtime and build system
+- **Node.js 18+**: local development and builds
 
-### 🔄 CI/CD Pipeline Setup
-
-#### **1. Repository Configuration**
+### 1. Clone and Explore
 ```bash
-# Clone the DevOps demonstration repository
-git clone https://github.com/pablodelarco/staywell-manager-e301a7db-1
-cd staywell-manager-e301a7db-1
+git clone https://github.com/pablodelarco/arco_rooms
+cd arco_rooms
 
 # Review the CI/CD pipeline configuration
 cat .github/workflows/ci-cd.yml
 ```
 
-#### **2. Container Build & Security**
+### 2. Local Development
 ```bash
-# Build production-ready container
-docker build -t staywell-manager .
+npm ci
+npm run dev
 
-# Run security scan (Trivy)
-trivy image staywell-manager
-
-# Multi-stage build optimization
-docker build --target production -t staywell-manager:prod .
+# Lint and type-check
+npm run lint
+npm run type-check
 ```
 
-#### **3. Kubernetes Deployment**
+### 3. Container Build and Security Scan
 ```bash
-# Deploy to development environment
+# Build production-ready container
+docker build -t roomio .
+
+# Run security scan (Trivy)
+trivy image roomio
+
+# Or use docker compose for a local run
+docker compose up
+```
+
+### 4. Kubernetes Deployment
+```bash
+# Deploy (defaults to the development overlay)
 kubectl apply -k k8s/
 
 # Monitor deployment status
-kubectl get pods -n staywell-manager-dev
-kubectl describe deployment staywell-frontend -n staywell-manager-dev
+kubectl get pods -n roomio-dev
+kubectl describe deployment roomio-frontend -n roomio-dev
 
 # Check ingress and networking
-kubectl get ingress -n staywell-manager-dev
-kubectl get services -n staywell-manager-dev
+kubectl get ingress -n roomio-dev
+kubectl get services -n roomio-dev
 ```
 
-#### **4. GitOps with ArgoCD**
+### 5. GitOps with ArgoCD
 ```bash
-# Apply ArgoCD application manifests
+# Apply ArgoCD application manifests (dev, staging, prod)
 kubectl apply -f argocd/applications/
 
 # Monitor GitOps deployment
 kubectl get applications -n argocd
-kubectl describe application staywell-dev -n argocd
+kubectl describe application roomio-dev -n argocd
 ```
 
-### 🌐 Infrastructure Access Points
+## Configuration
 
-- **🌍 Production Environment**: [pablodelarco.com](https://pablodelarco.com)
-- **� GitOps Dashboard**: ArgoCD interface for deployment management
-- **📊 Kubernetes Dashboard**: Container orchestration monitoring
-- **� Development Environment**: Local development setup
-- **📈 CI/CD Pipeline**: GitHub Actions workflow monitoring
-
-### 🔧 DevOps Configuration Management
-
-#### **Environment Variables & Secrets**
+### Environment Variables and Secrets
 ```bash
 # Local development configuration
 cp .env.example .env.local
-# Edit with your configuration values
+# Edit with your Supabase URL, anon key, and feature flags
 
 # Kubernetes secrets management
-kubectl create secret generic staywell-secrets \
+kubectl create secret generic roomio-secrets \
   --from-literal=supabase-url="your-supabase-url" \
   --from-literal=supabase-anon-key="your-anon-key" \
-  -n staywell-manager-dev
+  -n roomio-dev
 ```
 
-#### **ArgoCD Repository Configuration**
+### ArgoCD Repository Access
 ```bash
 # Configure ArgoCD repository access
 kubectl apply -f argocd/repository-secret.yaml
 # Update with your GitHub token for private repository access
 ```
 
-#### **Ingress & Domain Configuration**
+### Ingress and Domain
 ```bash
-# Configure custom domain routing
-kubectl apply -f k8s/pablodelarco-ingress.yaml
+# Configure custom domain routing through the ingress manifest
+kubectl apply -k k8s/
 # Update DNS records to point to your Kubernetes cluster
 ```
 
----
+### Further Documentation
 
-## 🛠️ DevOps Toolchain
+| Guide | Description |
+|---|---|
+| [DEPLOYMENT.md](DEPLOYMENT.md) | End-to-end deployment walkthrough |
+| [docs/CI-CD-PIPELINE.md](docs/CI-CD-PIPELINE.md) | Pipeline stages and configuration |
+| [docs/environment-separation-guide.md](docs/environment-separation-guide.md) | Dev, staging, and prod environment strategy |
+| [docs/ssl-tls-setup-guide.md](docs/ssl-tls-setup-guide.md) | SSL/TLS certificate setup |
+| [docs/SSL-TLS-SECURITY.md](docs/SSL-TLS-SECURITY.md) | TLS security hardening notes |
+| [docs/production-readiness-assessment.md](docs/production-readiness-assessment.md) | Production readiness checklist |
+| [DNS-SETUP-GUIDE.md](DNS-SETUP-GUIDE.md) | DNS configuration for custom domains |
+| [MIGRATION-GUIDE.md](MIGRATION-GUIDE.md) | Migration notes between environments |
 
-### **� CI/CD & Automation**
-- **GitHub Actions**: Automated testing, building, security scanning, and deployment
-- **Docker**: Multi-stage container builds with security hardening and optimization
-- **Trivy**: Container vulnerability scanning and compliance checking
-- **Makefile**: Standardized development and deployment automation
+## DevOps Practices Demonstrated
 
-### **☸️ Kubernetes & Orchestration**
-- **Kubernetes Manifests**: Declarative infrastructure configuration
-- **Kustomize**: Environment-specific configuration management
-- **ArgoCD**: GitOps continuous deployment and synchronization
-- **Traefik**: Cloud-native ingress controller and load balancer
+- **Infrastructure Engineering**: production-ready Kubernetes with health checks and resource management, declarative GitOps with ArgoCD, Traefik ingress with Cloudflare CDN and tunnel, and Infrastructure as Code through manifests and Kustomize overlays.
+- **Pipeline Automation**: complete GitHub Actions flow from commit to production, automated vulnerability scanning and container hardening, a multi-environment promotion strategy, and instant GitOps rollbacks with deployment history.
+- **Security and Reliability**: zero-downtime rolling updates with graceful shutdowns, non-root containers, Kubernetes network policies, OAuth integration, and multi-replica deployments.
+- **Operations**: CDN integration and custom domain management, container and caching optimization, audit trails, and deployment validation.
 
-### **🔒 Security & Monitoring**
-- **Container Security**: Non-root users, minimal base images, vulnerability scanning
-- **Network Policies**: Kubernetes-native network segmentation and isolation
-- **Health Checks**: Liveness and readiness probes for reliability
-- **Resource Management**: CPU/memory limits and requests for efficiency
+## License
 
-### **🌐 Infrastructure & Networking**
-- **Cloudflare**: Global CDN, DNS management, and secure tunnel integration
-- **SSL/TLS**: Automated certificate management and HTTPS enforcement
-- **Custom Domains**: Production-ready domain configuration and routing
-- **Load Balancing**: High availability and traffic distribution
+This project is available under the MIT License.
 
-## 📊 DevOps Metrics & Achievements
+## Acknowledgments
 
-- **🏗️ Infrastructure**: 100% Infrastructure as Code with Kubernetes manifests
-- **🔒 Security**: Automated vulnerability scanning with zero critical issues
-- **⚡ Performance**: Global CDN with <100ms response times worldwide
-- **🔄 Reliability**: 99.9% uptime with zero-downtime deployments
-- **📈 Scalability**: Auto-scaling from 1-10 replicas based on demand
-- **🚀 Deployment**: <5 minute deployment pipeline from commit to production
-
-## 🎓 Learning Outcomes & Skills Demonstrated
-
-### **☸️ Kubernetes & Container Orchestration**
-- Production-grade Kubernetes deployment and management
-- Container lifecycle management and optimization
-- Resource allocation, scaling, and performance tuning
-- Health checks, monitoring, and troubleshooting
-
-### **🔄 GitOps & CI/CD Mastery**
-- End-to-end automated deployment pipelines
-- Git-driven infrastructure management with ArgoCD
-- Multi-environment promotion strategies
-- Rollback procedures and deployment validation
-
-### **🔒 DevSecOps & Security Integration**
-- Container security scanning and vulnerability management
-- OAuth integration and authentication workflows
-- Network security policies and access control
-- Compliance automation and audit trails
-
-### **🌐 Cloud-Native Architecture**
-- Microservices design patterns and implementation
-- Load balancing and traffic management
-- CDN integration and global distribution
-- Infrastructure as Code principles and practices
-
-## 📝 Blog Post Series
-
-This project will be documented in a comprehensive blog post series covering:
-
-1. **"From Code to Cloud"**: Complete DevOps pipeline walkthrough
-2. **"Kubernetes in Production"**: Real-world orchestration challenges and solutions
-3. **"GitOps Mastery"**: Implementing declarative deployments with ArgoCD
-4. **"Security-First DevOps"**: Integrating security throughout the pipeline
-5. **"Scaling Cloud-Native Applications"**: Performance and reliability at scale
-
-## 🤝 Professional Collaboration
-
-This project demonstrates enterprise-ready practices suitable for:
-- **DevOps Engineering** roles and responsibilities
-- **Site Reliability Engineering** (SRE) practices
-- **Cloud Architecture** design and implementation
-- **Platform Engineering** and developer experience
-- **Security Engineering** and compliance automation
-
-## 📄 License & Usage
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-**Feel free to use this as a reference for your own DevOps implementations!**
-
-## 🙏 Technology Acknowledgments
-
-- **Kubernetes** for container orchestration excellence
-- **ArgoCD** for GitOps deployment automation
-- **GitHub Actions** for CI/CD pipeline integration
-- **Docker** for containerization standards
-- **Traefik** for cloud-native load balancing
-- **Cloudflare** for global infrastructure services
+Built on Kubernetes, ArgoCD, GitHub Actions, Docker, Traefik, Cloudflare, Supabase, and the React ecosystem.
 
 ---
 
-**Built with ❤️ by [Pablo del Arco](https://pablodelarco.com)**
-
-*Showcasing enterprise-grade DevOps engineering and cloud-native architecture expertise.*
+Built by [Pablo del Arco](https://pablodelarco.com)
